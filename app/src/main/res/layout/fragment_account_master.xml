@@ -1,0 +1,212 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    tools:context="com.ats.blucatch.fragment.AccountMasterFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvAccMasterSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edAccMaster_Search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="2"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:drawableRight="@drawable/icon_search_blue"
+                    android:hint="Search" />
+
+                <ImageView
+                    android:id="@+id/ivAccMaster_Filter"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/filter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llAccMasterFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/rgAccMaster_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rbAccMaster_All"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="All" />
+
+                    <RadioButton
+                        android:id="@+id/rbAccMaster_User"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="User" />
+
+                    <RadioButton
+                        android:id="@+id/rbAccMaster_Transaction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Transaction" />
+
+
+                </RadioGroup>
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+
+    <!-- <ScrollView
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_below="@id/cvAccMasterSearch">
+ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/cvAccMasterSearch"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lvAccMaster"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#00000000" />
+
+        <!--  <android.support.v7.widget.CardView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="7dp"
+              android:background="@color/colorWhite"
+              android:elevation="2dp"
+              app:cardElevation="5dp">
+
+              <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:gravity="center_vertical"
+                  android:orientation="vertical">
+
+                  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+
+                      <TextView
+                          android:id="@+id/tvAccMaster_AccType"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:background="@android:color/holo_red_light"
+                          android:maxLines="1"
+                          android:singleLine="true"
+                          android:text=" User Account"
+                          android:textColor="@color/colorWhite"
+                          android:textSize="15dp" />
+
+                      <LinearLayout
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:gravity="end"
+                          android:orientation="horizontal">
+
+                          <ImageView
+                              android:id="@+id/ivAccMaster_popup"
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginRight="10dp"
+                              android:src="@drawable/icon_popup" />
+
+                      </LinearLayout>
+
+
+                  </LinearLayout>
+
+                  <TextView
+                      android:id="@+id/tvAccMaster_UserName"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="10dp"
+                      android:layout_marginRight="10dp"
+                      android:layout_marginTop="2dp"
+                      android:drawableLeft="@drawable/icon_person_blue"
+                      android:drawablePadding="10dp"
+                      android:gravity="center_vertical"
+                      android:text="Sagar Saindane"
+                      android:textColor="@color/colorPrimary"
+                      android:textSize="20sp" />
+
+                  <TextView
+                      android:id="@+id/tvAccMaster_UserType"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginLeft="10dp"
+                      android:layout_marginRight="10dp"
+                      android:layout_marginTop="2dp"
+                      android:gravity="center_vertical"
+                      android:paddingLeft="40dp"
+                      android:text="( Auctioner )"
+                      android:textColor="@color/colorPrimaryDark" />
+
+                  <TextView
+                      android:id="@+id/tvAccMaster_Mobile"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_marginBottom="5dp"
+                      android:layout_marginLeft="10dp"
+                      android:layout_marginRight="10dp"
+                      android:layout_marginTop="5dp"
+                      android:drawableLeft="@drawable/icon_mobile_blue"
+                      android:drawablePadding="10dp"
+                      android:gravity="center_vertical"
+                      android:text="9898989898"
+                      android:textColor="@color/colorPrimary"
+                      android:textSize="20sp" />
+              </LinearLayout>
+          </android.support.v7.widget.CardView>-->
+
+    </LinearLayout>
+    <!--
+        </ScrollView>
+    -->
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabAccountMaster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/icon_add_white"
+        android:tint="@color/colorWhite"
+        app:backgroundTint="@android:color/holo_red_light" />
+</RelativeLayout>

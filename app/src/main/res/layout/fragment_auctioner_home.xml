@@ -1,0 +1,305 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    android:orientation="vertical"
+    tools:context="com.ats.blucatch.fragment.auctioner.AuctionerHomeFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvAuctHomeTripSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edAuctHomeTrip_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="2"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:drawableRight="@drawable/icon_search_blue"
+                    android:hint="Search" />
+
+                <ImageView
+                    android:id="@+id/ivAuctHomeTrip_Filter"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/filter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llAuctHomeTripFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Spinner
+                    android:id="@+id/spAuctHomeTrip_Boat"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/cvAuctHomeTripSearch"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lvAuctHomeTrip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#00000000" />
+
+        <!-- <android.support.v7.widget.CardView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_margin="7dp"
+             android:background="@color/colorWhite"
+             android:elevation="2dp"
+             app:cardElevation="5dp">
+
+             <LinearLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:background="@color/colorWhite"
+                 android:orientation="vertical">
+
+                 <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:gravity="end"
+                     android:orientation="horizontal">
+
+                     <ImageView
+                         android:id="@+id/ivAuctHomeTripPopUp"
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:background="@drawable/icon_popup" />
+
+                 </LinearLayout>
+
+                 <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginBottom="5dp"
+                     android:gravity="center_vertical"
+                     android:orientation="horizontal">
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_TripNo"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="2"
+                         android:drawableLeft="@mipmap/trip"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical"
+                         android:paddingLeft="5dp"
+                         android:text="Trip: 1454"
+                         android:textColor="@color/colorPrimary"
+                         android:textSize="18sp" />
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_Status"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="2"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical|center_horizontal"
+                         android:text="Live"
+                         android:textColor="@android:color/holo_red_light"
+                         android:textSize="18sp" />
+                 </LinearLayout>
+
+                 <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginBottom="5dp"
+                     android:layout_marginTop="5dp"
+                     android:gravity="center_vertical"
+                     android:orientation="horizontal">
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_BoatName"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="1"
+                         android:drawableLeft="@mipmap/boat"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical"
+                         android:paddingLeft="5dp"
+                         android:text="Sagar"
+                         android:textColor="@color/colorPrimary"
+                         android:textSize="18sp" />
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_TandelCrew"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="2"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical"
+                         android:text="Tandel + 14"
+                         android:textColor="@color/colorPrimary"
+                         android:textSize="18sp" />
+                 </LinearLayout>
+
+
+                 <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginTop="5dp"
+                     android:gravity="center_vertical"
+                     android:orientation="horizontal">
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_StDate"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="1"
+                         android:drawableLeft="@mipmap/date"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical"
+                         android:paddingLeft="5dp"
+                         android:text="25 june 2017"
+                         android:textColor="@color/colorPrimary"
+                         android:textSize="18sp" />
+
+                     <TextView
+                         android:id="@+id/tvAuctHomeTrip_TripDays"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_weight="2"
+                         android:drawablePadding="10dp"
+                         android:gravity="center_vertical"
+                         android:text="14 Days"
+                         android:textColor="@color/colorPrimary"
+                         android:textSize="18sp" />
+                 </LinearLayout>
+
+                 <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_margin="5dp"
+                     android:orientation="vertical">
+
+                     <TableRow
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content">
+
+                         <TextView
+                             android:id="@+id/tvAuctHomeTrip_TripExpenses"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_column="0"
+                             android:layout_marginRight="5dp"
+                             android:layout_weight="1"
+                             android:background="@drawable/custom_layout_border"
+                             android:gravity="center"
+                             android:maxLines="1"
+                             android:padding="10dp"
+                             android:singleLine="true"
+                             android:text="Trip Expenses"
+                             android:textColor="@color/colorBlue"
+                             android:textSize="18sp" />
+
+                         <TextView
+                             android:id="@+id/tvAuctHomeTrip_FishSell"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_column="1"
+                             android:layout_marginLeft="5dp"
+                             android:layout_weight="1"
+                             android:background="@drawable/custom_layout_border"
+                             android:gravity="center"
+                             android:maxLines="1"
+                             android:padding="10dp"
+                             android:singleLine="true"
+                             android:text="Fish Sell"
+                             android:textColor="@color/colorBlue"
+                             android:textSize="18sp" />
+                     </TableRow>
+
+                     <TableRow
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content">
+
+                         <TextView
+                             android:id="@+id/tvAuctHomeTrip_TripExpCount"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_column="0"
+                             android:layout_marginRight="5dp"
+                             android:layout_weight="1"
+                             android:background="@color/colorPrimary"
+                             android:gravity="center"
+                             android:maxLines="1"
+                             android:padding="10dp"
+                             android:singleLine="true"
+                             android:text="25000"
+                             android:textColor="@color/colorWhite"
+                             android:textSize="22sp" />
+
+                         <TextView
+                             android:id="@+id/tvAuctHomeTrip_FishSellCount"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_column="1"
+                             android:layout_marginLeft="5dp"
+                             android:layout_weight="1"
+                             android:background="@color/colorPrimary"
+                             android:gravity="center"
+                             android:maxLines="1"
+                             android:padding="10dp"
+                             android:singleLine="true"
+                             android:text="100000"
+                             android:textColor="@color/colorWhite"
+                             android:textSize="22sp" />
+
+                     </TableRow>
+
+                 </LinearLayout>
+
+             </LinearLayout>
+         </android.support.v7.widget.CardView>-->
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabAuctHomeTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/icon_add_white"
+        android:tint="@color/colorWhite"
+        android:visibility="gone"
+        app:backgroundTint="@android:color/holo_red_light" />
+</RelativeLayout>

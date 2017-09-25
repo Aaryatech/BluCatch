@@ -1,0 +1,94 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    android:orientation="vertical"
+    tools:context="com.ats.blucatch.fragment.tandel.TandelHomeFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvTandelHomeTripSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edTandelHomeTrip_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="2"
+                    android:background="@android:drawable/editbox_background_normal"
+                    android:drawableRight="@drawable/icon_search_blue"
+                    android:hint="Search" />
+
+                <ImageView
+                    android:id="@+id/ivTandelHomeTrip_Filter"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/filter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llTandelHomeTripFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <Spinner
+                    android:id="@+id/spTandelHomeTrip_Boat"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/cvTandelHomeTripSearch"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lvTandelHomeTrip"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#00000000" />
+
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabTandelHomeTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/icon_add_white"
+        android:tint="@color/colorWhite"
+        android:visibility="gone"
+        app:backgroundTint="@android:color/holo_red_light" />
+</RelativeLayout>

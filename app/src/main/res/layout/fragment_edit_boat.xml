@@ -1,0 +1,483 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    tools:context="com.ats.blucatch.fragment.EditBoatFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:elevation="2dp"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvEditBoat_ownerId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvEditBoat_tandelId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvEditBoat_auctionerId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_BoatName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_BoatName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Boat Name"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_RegNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_RegNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Registered Number"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelRegOwner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Registered Owner"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+
+                <!-- <View
+                     android:layout_width="match_parent"
+                     android:layout_height="1dp"
+                     android:layout_marginLeft="20dp"
+                     android:layout_marginRight="20dp"
+                     android:background="@color/colorPrimaryDark" />
+     -->
+                <Spinner
+                    android:id="@+id/spEditBoat_RegOwner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelRegTandel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Registered Tandel"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+
+                <!-- <View
+                     android:layout_width="match_parent"
+                     android:layout_height="1dp"
+                     android:layout_marginLeft="20dp"
+                     android:layout_marginRight="20dp"
+                     android:background="@color/colorPrimaryDark" />
+     -->
+                <Spinner
+                    android:id="@+id/spEditBoat_RegTandel"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelRegAuctioner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Registered Auctioner"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+
+                <!--  <View
+                      android:layout_width="match_parent"
+                      android:layout_height="1dp"
+                      android:layout_marginLeft="20dp"
+                      android:layout_marginRight="20dp"
+                      android:background="@color/colorPrimaryDark" />
+      -->
+                <Spinner
+                    android:id="@+id/spEditBoat_RegAuctioner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_PurDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:editable="false"
+                        android:id="@+id/edEditBoat_PurDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Purchase Date"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelBoatSize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Boat Size"
+                    android:textSize="20sp" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:orientation="horizontal">
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textEditBoat_BoatSize_L"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColorHint="@color/colorPrimaryDark">
+
+                        <EditText
+                            android:id="@+id/edEditBoat_BoatSize_L"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Length"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textSize="20sp" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textEditBoat_BoatSize_B"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColorHint="@color/colorPrimaryDark">
+
+                        <EditText
+                            android:id="@+id/edEditBoat_BoatSize_B"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Breadth"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textSize="20sp" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/textEditBoat_BoatSize_H"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColorHint="@color/colorPrimaryDark">
+
+                        <EditText
+                            android:id="@+id/edEditBoat_BoatSize_H"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Height"
+                            android:inputType="number"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:textSize="20sp" />
+                    </android.support.design.widget.TextInputLayout>
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelFishingType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Type of Fishing"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+
+                <!--
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginRight="20dp"
+                                android:background="@color/colorPrimaryDark" />
+                -->
+
+                <Spinner
+                    android:id="@+id/spEditBoat_FishingType"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_LicenseNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_LicenseNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="License Number"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_LicFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:editable="false"
+                        android:id="@+id/edEditBoat_LicFrom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="License From"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_Lic_To"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_LicTo"
+                        android:editable="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="License To"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_InsureFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_InsureFrom"
+                        android:editable="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Insurance From"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_InsureTo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:editable="false"
+                        android:id="@+id/edEditBoat_InsureTo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Insurance To"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_EngineType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_EngineType"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Engine Type"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/textEditBoat_HPRating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:textColorHint="@color/colorPrimaryDark">
+
+                    <EditText
+                        android:id="@+id/edEditBoat_HPRating"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="HP Rating"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textSize="20sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/tvEditBoat_LabelBoatStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Boat Status"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp" />
+
+                <!--
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginRight="20dp"
+                                android:background="@color/colorPrimaryDark" />
+                -->
+
+                <Spinner
+                    android:id="@+id/spEditBoat_BoatStatus"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnEditBoat_Update"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="60dp"
+                        android:layout_marginRight="60dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@mipmap/btn_back"
+                        android:text="Update"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="20sp" />
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </ScrollView>
+</LinearLayout>

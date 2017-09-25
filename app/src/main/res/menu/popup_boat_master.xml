@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_boat_edit"
+        android:icon="@drawable/ic_edit_blue"
+        android:title="Edit Boat" />
+    <item
+        android:id="@+id/item_boat_block_unblock"
+        android:icon="@drawable/ic_block_blue"
+        android:title="Block / Unblock" />
+    <item
+        android:id="@+id/item_boat_trip_details"
+        android:icon="@drawable/ic_details_blue"
+        android:title="Trip Details" />
+    <item
+        android:id="@+id/item_boat_expenses"
+        android:icon="@drawable/ic_expenses_blue"
+        android:title="Boat Expenses" />
+    <item
+        android:id="@+id/item_boat_delete"
+        android:icon="@drawable/ic_delete_blue"
+        android:title="Delete Boat" />
+</menu>

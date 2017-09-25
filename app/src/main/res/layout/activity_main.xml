@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
+
+    <include
+        layout="@layout/app_bar_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@mipmap/drawer_bg"
+                android:scrollbars="none">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <include
+                        layout="@layout/nav_header_main"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+
+                    <LinearLayout
+                        android:id="@+id/llAdminMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvMenuAddAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:fontFamily="serif"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Account Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuUserMgmt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="User Management"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuBoatMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Boat Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuFishMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Fish Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuTripMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Trip Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuShowExpenses"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Expenses Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuTransactionMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Transaction Master"
+                            android:textSize="18sp"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tvMenuViewLedger"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="View Ledger"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuSendNotification"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Send Notification"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuChangePassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Change Password"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuLogout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Logout"
+                            android:textSize="18sp" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llUserMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvMenuUserViewLedger"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="View Ledger"
+                            android:textSize="18sp" />
+
+
+                        <TextView
+                            android:id="@+id/tvMenuUserChangePassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Change Password"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuUserLogout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Logout"
+                            android:textSize="18sp" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llManagerMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerBoatMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Boat Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerFishMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Fish Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerTripMaster"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Trip Master"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerViewLedger"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="View Ledger"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerChangePass"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Change Password"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMenuManagerLogout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Logout"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
+
+        </LinearLayout>
+    </android.support.design.widget.NavigationView>
+
+</android.support.v4.widget.DrawerLayout>

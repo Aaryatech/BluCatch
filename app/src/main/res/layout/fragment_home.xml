@@ -1,0 +1,394 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    android:orientation="vertical"
+    tools:context="com.ats.blucatch.fragment.HomeFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/rlViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="190dp">
+
+                <android.support.v4.view.ViewPager
+                    android:id="@+id/viewPager_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="190dp" />
+
+                <ImageView
+                    android:id="@+id/ivLeft"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_left" />
+
+                <ImageView
+                    android:id="@+id/ivRight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_right" />
+
+
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorBlue"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvMain_LabelSell"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:drawableLeft="@mipmap/sell"
+                    android:drawablePadding="10dp"
+                    android:text="Sell"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvMain_SellCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="end"
+                    android:text="1,23,52,035"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="23sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:background="@color/colorBlue"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvMain_LabelExpenses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:drawableLeft="@mipmap/expense"
+                    android:drawablePadding="10dp"
+                    android:text="Expenses"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvMain_ExpensesCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="end"
+                    android:text="23,52,035"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="23sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="1dp"
+                android:background="@color/colorBlue"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvMain_LabelIncome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:drawableLeft="@mipmap/income"
+                    android:drawablePadding="10dp"
+                    android:text="Income"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvMain_IncomeCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="end"
+                    android:text="70,52,035"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="23sp" />
+            </LinearLayout>
+
+
+            <!--<android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:layout_marginTop="3dp"
+                android:background="@color/colorWhite"
+                android:elevation="2dp"
+                app:cardElevation="3dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorWhite"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvMain_TripNo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:drawableLeft="@mipmap/trip"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="5dp"
+                            android:text="Trip: 1454"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMain_Status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:text="Live"
+                            android:textColor="@android:color/holo_red_light"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvMain_BoatName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawableLeft="@mipmap/boat"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="5dp"
+                            android:text="Sagar"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMain_TandelCrew"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical"
+                            android:text="Tandel + 14"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvMain_StDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:drawableLeft="@mipmap/date"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical"
+                            android:paddingLeft="5dp"
+                            android:text="25 june 2017"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvMain_TripDays"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:drawablePadding="10dp"
+                            android:gravity="center_vertical"
+                            android:text="14 Days"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:orientation="vertical">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/tvMain_OnBoatCash"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="0"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/custom_layout_border"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="On Boat Cash"
+                                android:textColor="@color/colorBlue"
+                                android:textSize="18sp" />
+
+
+                            <TextView
+                                android:id="@+id/tvMain_TripExpenses"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="1"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/custom_layout_border"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="Trip Expenses"
+                                android:textColor="@color/colorBlue"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:id="@+id/tvMain_FishSell"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="2"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_weight="1"
+                                android:background="@drawable/custom_layout_border"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="Fish Sell"
+                                android:textColor="@color/colorBlue"
+                                android:textSize="18sp" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/tvMain_onBoatCashCount"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="0"
+                                android:layout_marginBottom="2dp"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_weight="1"
+                                android:background="@color/colorPrimary"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="500000"
+                                android:textColor="@color/colorWhite"
+                                android:textSize="22sp" />
+
+
+                            <TextView
+                                android:id="@+id/tvMain_TripExpCount"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="0"
+                                android:layout_marginBottom="2dp"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_weight="1"
+                                android:background="@color/colorPrimary"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="25000"
+                                android:textColor="@color/colorWhite"
+                                android:textSize="22sp" />
+
+                            <TextView
+                                android:id="@+id/tvMain_FishSellCount"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_column="1"
+                                android:layout_marginBottom="2dp"
+                                android:layout_marginLeft="2dp"
+                                android:layout_marginRight="2dp"
+                                android:layout_weight="1"
+                                android:background="@color/colorPrimary"
+                                android:gravity="center"
+                                android:padding="10dp"
+                                android:text="100000"
+                                android:textColor="@color/colorWhite"
+                                android:textSize="22sp" />
+                        </TableRow>
+                    </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>-->
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ListView
+        android:id="@+id/lvHomeDispTrip"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#00000000" />
+
+</LinearLayout>

@@ -1,0 +1,319 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/back"
+    tools:context="com.ats.blucatch.fragment.UserTripExpenseFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvUserTripExp_Search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edUserTripExp_Search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@android:drawable/editbox_background_normal"
+                android:drawableRight="@drawable/icon_search_blue"
+                android:hint="Search" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/llUserTripExp_Head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cvUserTripExp_Search"
+        android:background="@color/colorWhite"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="0.5dp"
+            android:layout_weight="1.5"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUserTripExp_LabelTripNo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_layout_border"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="10dp"
+                android:text="Trip No."
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvUserTripExp_TripNo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="1434534"
+                android:textColor="@color/colorWhite"
+                android:textSize="23sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0.5dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUserTripExp_LabelExpense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_layout_border"
+                android:gravity="center_vertical|center_horizontal"
+                android:padding="10dp"
+                android:text="Total Expense"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvUserTripExp_Expense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="150000233000/-"
+                android:textColor="@color/colorWhite"
+                android:textSize="23sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--<android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorWhite"
+        android:elevation="2dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_LabelDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="2.5"
+                    android:background="#cecccc"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:padding="10dp"
+                    android:text="Date"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_LabelTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="1dp"
+                    android:layout_weight="1"
+                    android:background="#cecccc"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:padding="10dp"
+                    android:text="Expense Title"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#cecccc"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_Date1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="2.5"
+                    android:background="@color/colorWhite"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingTop="1dp"
+                    android:text="25 july 2017"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_Title1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorWhite"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="2dp"
+                    android:paddingTop="1dp"
+                    android:text="asdasdsadsae asdsadasd sadas sadasdass"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#cecccc"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_Date2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="2.5"
+                    android:background="@color/colorWhite"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:paddingTop="1dp"
+                    android:text="25 july 2017"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvUserTripExp_Title2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorWhite"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="2dp"
+                    android:paddingTop="1dp"
+                    android:text="asdasdsadsae asds sadasda sadasdass"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </android.support.v7.widget.CardView>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/llUserTripExp_Head"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/lvUserTripExp_List"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#00000000" />
+
+        <!--   <android.support.v7.widget.CardView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_margin="5dp"
+               android:elevation="2dp"
+               app:cardElevation="5dp">
+
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:gravity="center_vertical"
+                   android:orientation="vertical">
+
+                   <TextView
+                       android:id="@+id/tvUserTripExp_Date1"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@android:color/holo_red_light"
+                       android:maxLines="1"
+                       android:singleLine="true"
+                       android:text=" 25 July 2017 "
+                       android:textColor="@color/colorWhite"
+                       android:textSize="15dp" />
+
+                   <TextView
+                       android:id="@+id/tvUserTripExp_Name1"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_marginLeft="10dp"
+                       android:layout_marginRight="10dp"
+                       android:layout_marginTop="2dp"
+                       android:text="Adssdsc sddsdssfdsdsds dssdsfdsfds"
+                       android:textSize="20sp" />
+
+                   <TextView
+                       android:id="@+id/tvUserTripExp_Desc1"
+                       android:layout_width="match_parent"
+                       android:layout_height="wrap_content"
+                       android:layout_marginLeft="10dp"
+                       android:layout_marginRight="10dp"
+                       android:text="dsafdsfsdfsdfsdf sdfsdflds lsdkfds lksdfnd sklfdskf dsflds fdsf dsf "
+                       android:textSize="15sp" />
+
+                   <TextView
+                       android:id="@+id/tvUserTripExp_Amt1"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_gravity="end"
+                       android:layout_marginBottom="10dp"
+                       android:layout_marginRight="20dp"
+                       android:maxLines="1"
+                       android:singleLine="true"
+                       android:text="5000 /-"
+                       android:textSize="22sp" />
+               </LinearLayout>
+           </android.support.v7.widget.CardView>-->
+
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabEnterExp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/icon_add_white"
+        android:tint="@color/colorWhite"
+        app:backgroundTint="@android:color/holo_red_light" />
+
+</RelativeLayout>
