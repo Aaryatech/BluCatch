@@ -162,7 +162,6 @@ public class UserMasterFragment extends Fragment {
         }
     }
 
-
     public void getUserData() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
 
@@ -183,28 +182,33 @@ public class UserMasterFragment extends Fragment {
             userDataCall.enqueue(new Callback<UserData>() {
                 @Override
                 public void onResponse(Call<UserData> call, Response<UserData> response) {
-                    if (response.body() != null) {
-                        UserData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("ON RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                            Toast.makeText(getContext(), "unable to fetch data", Toast.LENGTH_SHORT).show();
-                        } else {
+                    try {
+                        if (response.body() != null) {
+                            UserData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("ON RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                Toast.makeText(getContext(), "unable to fetch data", Toast.LENGTH_SHORT).show();
+                            } else {
 
-                            for (int i = 0; i < data.getUser().size(); i++) {
-                                userArray.add(i, data.getUser().get(i));
+                                for (int i = 0; i < data.getUser().size(); i++) {
+                                    userArray.add(i, data.getUser().get(i));
+                                }
+                                Log.e("RESPONSE : ", " DATA : " + userArray);
+                                //setAdapterData();
+                                adapter1 = new MyAdapter(getContext(), userArray);
+                                lvUserMaster.setAdapter(adapter1);
+                                progressBar1.dismiss();
+
                             }
-                            Log.e("RESPONSE : ", " DATA : " + userArray);
-                            //setAdapterData();
-                            adapter1 = new MyAdapter(getContext(), userArray);
-                            lvUserMaster.setAdapter(adapter1);
+                        } else {
                             progressBar1.dismiss();
-
+                            Toast.makeText(getContext(), "unable to fetch data", Toast.LENGTH_SHORT).show();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-                    } else {
+                    } catch (Exception e) {
                         progressBar1.dismiss();
-                        Toast.makeText(getContext(), "unable to fetch data", Toast.LENGTH_SHORT).show();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -218,7 +222,7 @@ public class UserMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -228,7 +232,7 @@ public class UserMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -255,37 +259,42 @@ public class UserMasterFragment extends Fragment {
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar2.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar2.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar2.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("User deleted successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getUserData();
+                                        //setAdapterData();
+                                        adapter1.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
                             progressBar2.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("User deleted successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getUserData();
-                                    //setAdapterData();
-                                    adapter1.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            Toast.makeText(getContext(), "Unable to delete User!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar2.dismiss();
-                        Toast.makeText(getContext(), "Unable to delete User!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -299,7 +308,7 @@ public class UserMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -309,7 +318,7 @@ public class UserMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -339,37 +348,42 @@ public class UserMasterFragment extends Fragment {
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getUserData();
+                                        //setAdapterData();
+                                        adapter1.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
                             progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("" + data.getMessage());
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getUserData();
-                                    //setAdapterData();
-                                    adapter1.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            Toast.makeText(getContext(), "Unable to block / unblock User!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to block / unblock User!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -383,7 +397,7 @@ public class UserMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -393,11 +407,10 @@ public class UserMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public class MyAdapter extends BaseAdapter implements Filterable {
 
@@ -474,7 +487,7 @@ public class UserMasterFragment extends Fragment {
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
 
                             } else if (menuItem.getItemId() == R.id.item_user_block) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to block / unblock user?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -493,7 +506,7 @@ public class UserMasterFragment extends Fragment {
                                 dialog.show();
                                 //Toast.makeText(getContext(), "Block / Unblock", Toast.LENGTH_SHORT).show();
                             } else if (menuItem.getItemId() == R.id.item_user_delete) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to delete user?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

@@ -19,11 +19,12 @@ public class Trip {
     private int coId;
     private long enterDate;
     private long enterBy;
+    private int seasonId;
 
     public Trip() {
     }
 
-    public Trip(long tripId, long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, int coId, long enterDate, long enterBy) {
+    public Trip(long tripId, long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, int coId, long enterDate, long enterBy, int seasonId) {
         this.tripId = tripId;
         this.boatId = boatId;
         this.tripStartDate = tripStartDate;
@@ -37,9 +38,10 @@ public class Trip {
         this.coId = coId;
         this.enterDate = enterDate;
         this.enterBy = enterBy;
+        this.seasonId = seasonId;
     }
 
-    public Trip(long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, int coId, long enterDate, long enterBy) {
+    public Trip(long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, int coId, long enterDate, long enterBy, int seasonId) {
         this.boatId = boatId;
         this.tripStartDate = tripStartDate;
         this.tripEndDate = tripEndDate;
@@ -52,6 +54,7 @@ public class Trip {
         this.coId = coId;
         this.enterDate = enterDate;
         this.enterBy = enterBy;
+        this.seasonId = seasonId;
     }
 
     public long getTripId() {
@@ -158,6 +161,14 @@ public class Trip {
         this.enterBy = enterBy;
     }
 
+    public int getSeasonId() {
+        return seasonId;
+    }
+
+    public void setSeasonId(int seasonId) {
+        this.seasonId = seasonId;
+    }
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -167,13 +178,14 @@ public class Trip {
                 ", tripEndDate=" + tripEndDate +
                 ", tripTandelId=" + tripTandelId +
                 ", tripAuctionerId=" + tripAuctionerId +
-                ", tripStaff=" + tripStaff +
+                ", tripStaff='" + tripStaff + '\'' +
                 ", tripSettled=" + tripSettled +
                 ", tripStatus='" + tripStatus + '\'' +
                 ", tripDelete=" + tripDelete +
                 ", coId=" + coId +
                 ", enterDate=" + enterDate +
                 ", enterBy=" + enterBy +
+                ", seasonId=" + seasonId +
                 '}';
     }
 }

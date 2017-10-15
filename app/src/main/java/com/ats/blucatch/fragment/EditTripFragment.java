@@ -64,7 +64,7 @@ public class EditTripFragment extends Fragment {
     private ArrayList<Long> crewIdArray = new ArrayList<>();
     private ArrayList<String> crewNameArray = new ArrayList<>();
 
-    int tripId;
+    long tripId;
     String status;
 
 
@@ -76,6 +76,11 @@ public class EditTripFragment extends Fragment {
     private ArrayList<String> staffNameArray = new ArrayList<>();
     private ArrayList<Long> staffIdArray = new ArrayList<>();
 
+    String tStatus = "";
+    String tandelName = "";
+    String auctionerName = "";
+    long tandelId;
+    long auctionerId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -115,11 +120,15 @@ public class EditTripFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         spBoatName = view.findViewById(R.id.spEditTrip_BoatName);
         tvBoatName = view.findViewById(R.id.tvLabelEditTrip_BoatName);
@@ -174,11 +183,51 @@ public class EditTripFragment extends Fragment {
             }
         });
 
-        tripId = getArguments().getInt("Trip_Id");
-        long stDate = getArguments().getLong("Trip_Start_Date");
-        long endDt = getArguments().getLong("Trip_End_Date");
-        bStaff = getArguments().getString("Trip_Staff_Count");
-        String tStatus = getArguments().getString("Trip_Status");
+
+        try {
+            tripId = getArguments().getLong("Trip_Id");
+            Log.e("Edit Trip : ", " TRIP ID  : " + tripId);
+            long stDate = getArguments().getLong("Trip_Start_Date");
+            long endDt = getArguments().getLong("Trip_End_Date");
+            bStaff = getArguments().getString("Trip_Staff_Count");
+            tStatus = getArguments().getString("Trip_Status");
+            tandelName = getArguments().getString("Trip_Tandel_Name");
+            auctionerName = getArguments().getString("Trip_Auctioner_Name");
+            tandelId = getArguments().getLong("Trip_Tandel_Id");
+            auctionerId = getArguments().getLong("Trip_Auctioner_Id");
+            Log.e("tandelName : ", "" + tandelName);
+            Log.e("auctionerName : ", "" + auctionerName);
+            Log.e("tandelId : ", "" + tandelId);
+            Log.e("auctionerId : ", "" + auctionerId);
+            if (tStatus.equals("Live")) {
+                tandelIdArray.add(tandelId);
+                tandelArray.add(tandelName);
+
+                auctionerIdArray.add(auctionerId);
+                auctionerArray.add(auctionerName);
+
+                ArrayAdapter<String> adapterAuctionerName = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, auctionerArray);
+                adapterAuctionerName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spAuctionerName.setAdapter(adapterAuctionerName);
+                if (!auctionerName.equals(null)) {
+                    int spinnerPosition = adapterAuctionerName.getPosition(auctionerName);
+                    spAuctionerName.setSelection(spinnerPosition);
+                }
+
+                ArrayAdapter<String> adapterTandelName = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, tandelArray);
+                adapterTandelName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spTandelName.setAdapter(adapterTandelName);
+                if (!tandelName.equals(null)) {
+                    int spinnerPosition = adapterTandelName.getPosition(tandelName);
+                    spTandelName.setSelection(spinnerPosition);
+                }
+            }
+
+
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
+
 
         Log.e("Edit Trip : ", " Staff : " + bStaff);
         //edStaffCount.setText("" + bStaff);
@@ -207,12 +256,10 @@ public class EditTripFragment extends Fragment {
             }
         });
 
-
         return view;
     }
 
-
-    public void editTripData(int id) {
+    public void editTripData(long id) {
         if (CheckNetwork.isInternetAvailable(getContext())) {
 
             if (tvBoatId.getText().toString().trim().isEmpty()) {
@@ -224,10 +271,12 @@ public class EditTripFragment extends Fragment {
             } else if (tvAuctionerId.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "please select auctioner", Toast.LENGTH_SHORT).show();
                 spAuctionerName.requestFocus();
-            } else if (edStaffCount.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "please select staff", Toast.LENGTH_SHORT).show();
-                edStaffCount.requestFocus();
-            } else {
+            }
+//            else if (edStaffCount.getText().toString().isEmpty()) {
+//                Toast.makeText(getContext(), "please select staff", Toast.LENGTH_SHORT).show();
+//                edStaffCount.requestFocus();
+//            }
+            else {
                 long boatId = Integer.parseInt(tvBoatId.getText().toString().trim());
                 long tanId = Integer.parseInt(tvTandelId.getText().toString().trim());
                 long aucId = Integer.parseInt(tvAuctionerId.getText().toString().trim());
@@ -237,14 +286,19 @@ public class EditTripFragment extends Fragment {
                 } else if (rbClosed.isChecked()) {
                     status = "Closed";
                 }
-                for (int m = 0; m < tempIds.size(); m++) {
-                    staffCount += tempIds.get(m) + ",";
-                }
-                Log.e("Staff Parameter : ", "" + staffCount);
-                String staffIds = staffCount.substring(0, staffCount.length() - 1);
-                Log.e("Staff Parameter : ", " After Trip : " + staffIds);
 
-                Trip trip = new Trip(boatId, 0, 0, tanId, aucId, staffIds, 0, status, 0, coId, 0, userId);
+                String staffIds = "";
+                if (tempIds.size() > 0) {
+                    for (int m = 0; m < tempIds.size(); m++) {
+                        staffCount += tempIds.get(m) + ",";
+                    }
+                    Log.e("Staff Parameter : ", "" + staffCount);
+                    staffIds = staffCount.substring(0, staffCount.length() - 1);
+                    Log.e("Staff Parameter : ", " After Trip : " + staffIds);
+                }
+
+
+                Trip trip = new Trip(boatId, 0, 0, tanId, aucId, staffIds, 0, status, 0, coId, 0, userId, 0);
 
                 Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
                         .addConverterFactory(GsonConverterFactory.create())
@@ -273,7 +327,7 @@ public class EditTripFragment extends Fragment {
 
                             } else {
                                 progressBar2.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Success");
                                 builder.setCancelable(false);
                                 builder.setMessage("Trip updated successfully.");
@@ -284,7 +338,7 @@ public class EditTripFragment extends Fragment {
                                         // resetData();
                                     }
                                 });
-                                android.app.AlertDialog dialog = builder.create();
+                                AlertDialog dialog = builder.create();
                                 dialog.show();
                             }
 
@@ -305,7 +359,7 @@ public class EditTripFragment extends Fragment {
 
             }
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -315,7 +369,7 @@ public class EditTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -329,7 +383,6 @@ public class EditTripFragment extends Fragment {
 
 
     }
-
 
     public void getSpinnerDataforBoat() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -351,43 +404,47 @@ public class EditTripFragment extends Fragment {
             boatDataCall.enqueue(new Callback<BoatData>() {
                 @Override
                 public void onResponse(Call<BoatData> call, Response<BoatData> response) {
+                    try {
+                        if (response.body() != null) {
+                            BoatData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                boatArray.clear();
+                                boatIdArray.clear();
+                                for (int i = 0; i < data.getBoatDisp().size(); i++) {
+                                    boatArray.add(i, data.getBoatDisp().get(i).getBoatName());
+                                    boatIdArray.add(i, data.getBoatDisp().get(i).getBoatId());
+                                }
 
-                    if (response.body() != null) {
-                        BoatData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        boatArray);
+                                spBoatName.setAdapter(spAdapterOwner);
+
+                                String bName = getArguments().getString("Trip_Boat_Name");
+
+                                ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, boatArray);
+                                adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spBoatName.setAdapter(adapter2);
+                                if (!bName.equals(null)) {
+                                    int spinnerPosition = adapter2.getPosition(bName);
+                                    spBoatName.setSelection(spinnerPosition);
+                                }
+
+                                progressBar1.dismiss();
+                            }
+
                         } else {
-                            boatArray.clear();
-                            boatIdArray.clear();
-                            for (int i = 0; i < data.getBoatDisp().size(); i++) {
-                                boatArray.add(i, data.getBoatDisp().get(i).getBoatName());
-                                boatIdArray.add(i, data.getBoatDisp().get(i).getBoatId());
-                            }
-
-                            Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    boatArray);
-                            spBoatName.setAdapter(spAdapterOwner);
-
-                            String bName = getArguments().getString("Trip_Boat_Name");
-
-                            ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, boatArray);
-                            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spBoatName.setAdapter(adapter2);
-                            if (!bName.equals(null)) {
-                                int spinnerPosition = adapter2.getPosition(bName);
-                                spBoatName.setSelection(spinnerPosition);
-                            }
-
                             progressBar1.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar1.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -400,7 +457,7 @@ public class EditTripFragment extends Fragment {
 
 
         } else {
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -410,113 +467,11 @@ public class EditTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();*/
             Log.e("Edit Trip : ", " NO Internet");
         }
     }
-
-
-   /* public void getSpinnerDataforName() {
-        if (CheckNetwork.isInternetAvailable(getContext())) {
-
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            InterfaceApi api = retrofit.create(InterfaceApi.class);
-            Call<AccountData> accountDataCall = api.allAccountData();
-
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
-
-            accountDataCall.enqueue(new Callback<AccountData>() {
-                @Override
-                public void onResponse(Call<AccountData> call, Response<AccountData> response) {
-
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            for (int i = 0, k = 0, a = 0, c = 0; i < data.getAccount().size(); i++) {
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
-                                    tandelArray.add(k, data.getAccount().get(i).getAccName());
-                                    tandelIdArray.add(k, data.getAccount().get(i).getAccId());
-                                    k++;
-                                }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Auctioner")) {
-                                    auctionerArray.add(a, data.getAccount().get(i).getAccName());
-                                    auctionerIdArray.add(a, data.getAccount().get(i).getAccId());
-                                    a++;
-                                }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Crew")) {
-                                    crewNameArray.add(c, data.getAccount().get(i).getAccName());
-                                    crewIdArray.add(c, data.getAccount().get(i).getAccId());
-                                    c++;
-                                }
-                            }
-
-                            getCrewData();
-
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    tandelArray);
-                            spTandelName.setAdapter(spAdapterOwner);
-
-                            MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    auctionerArray);
-                            spAuctionerName.setAdapter(spAdapterTandel);
-
-                            String tName = getArguments().getString("Trip_Tandel_Name");
-                            String aName = getArguments().getString("Trip_Auctioner_Name");
-
-                            ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, tandelArray);
-                            adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spTandelName.setAdapter(adapter3);
-                            if (!tName.equals(null)) {
-                                int spinnerPosition = adapter3.getPosition(tName);
-                                spTandelName.setSelection(spinnerPosition);
-                            }
-
-                            ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, auctionerArray);
-                            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spAuctionerName.setAdapter(adapter2);
-                            if (!aName.equals(null)) {
-                                int spinnerPosition = adapter2.getPosition(aName);
-                                spAuctionerName.setSelection(spinnerPosition);
-                            }
-
-                            progressBar.dismiss();
-                        }
-
-                    } else {
-                        progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<AccountData> call, Throwable t) {
-                    progressBar.dismiss();
-                    Log.e("ON FAILURE : ", " ERROR : " + t.getMessage());
-                }
-            });
-
-
-        } else {
-            Log.e("Add Trip : ", " NO Internet");
-        }
-    }*/
 
     public void spinnerListener() {
         spBoatName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -579,29 +534,33 @@ public class EditTripFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
-
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar3.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            staffNameArray.clear();
-                            staffIdArray.clear();
-                            for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
-                                if (tandelId == data.getAccount().get(i).getTandelAccId()) {
-                                    staffNameArray.add(j, data.getAccount().get(i).getAccName());
-                                    staffIdArray.add(j, data.getAccount().get(i).getAccId());
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar3.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                staffNameArray.clear();
+                                staffIdArray.clear();
+                                for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
+                                    if (tandelId == data.getAccount().get(i).getTandelAccId()) {
+                                        staffNameArray.add(j, data.getAccount().get(i).getAccName());
+                                        staffIdArray.add(j, data.getAccount().get(i).getAccId());
+                                    }
                                 }
+                                Log.e("RESPONSE : ", " CREW DATA : " + staffNameArray);
+
+                                progressBar3.dismiss();
                             }
-                            Log.e("RESPONSE : ", " CREW DATA : " + staffNameArray);
 
+                        } else {
                             progressBar3.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar3.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -627,7 +586,7 @@ public class EditTripFragment extends Fragment {
         tempCrewName.clear();
         tempIds.clear();
 
-        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder ab = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
         ab.setTitle("Select Crew Members")
                 .setMultiChoiceItems(staffArray, null, new DialogInterface.OnMultiChoiceClickListener() {
 
@@ -668,7 +627,6 @@ public class EditTripFragment extends Fragment {
         ab.show();
 
     }
-
 
     public void getCrewData() {
 
@@ -720,44 +678,62 @@ public class EditTripFragment extends Fragment {
             allSpinnerDataForTripCall.enqueue(new Callback<AllSpinnerDataForTrip>() {
                 @Override
                 public void onResponse(Call<AllSpinnerDataForTrip> call, Response<AllSpinnerDataForTrip> response) {
+                    try {
+                        if (response.body() != null) {
+                            AllSpinnerDataForTrip data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                // Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
 
-                    if (response.body() != null) {
-                        AllSpinnerDataForTrip data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            // Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                for (int i = 0; i < data.getTandelSpinner().size(); i++) {
+                                    tandelArray.add(i, data.getTandelSpinner().get(i).getTandelName());
+                                    tandelIdArray.add(i, data.getTandelSpinner().get(i).getTandelId());
+                                }
+                                for (int i = 0; i < data.getAuctionerSpinner().size(); i++) {
+                                    auctionerArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerName());
+                                    auctionerIdArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerId());
+                                }
+
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        tandelArray);
+                                spTandelName.setAdapter(spAdapterOwner);
+
+                                MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        auctionerArray);
+                                spAuctionerName.setAdapter(spAdapterTandel);
+
+                                ArrayAdapter<String> adapterAuctionerName = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, auctionerArray);
+                                adapterAuctionerName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spAuctionerName.setAdapter(adapterAuctionerName);
+                                if (!auctionerName.equals(null)) {
+                                    int spinnerPosition = adapterAuctionerName.getPosition(auctionerName);
+                                    spAuctionerName.setSelection(spinnerPosition);
+                                }
+
+                                ArrayAdapter<String> adapterTandelName = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, tandelArray);
+                                adapterTandelName.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spTandelName.setAdapter(adapterTandelName);
+                                if (!tandelName.equals(null)) {
+                                    int spinnerPosition = adapterTandelName.getPosition(tandelName);
+                                    spTandelName.setSelection(spinnerPosition);
+                                }
+
+
+                                progressBar.dismiss();
+                            }
+
                         } else {
-                            tandelIdArray.clear();
-                            tandelArray.clear();
-                            auctionerIdArray.clear();
-                            auctionerArray.clear();
-                            for (int i = 0; i < data.getTandelSpinner().size(); i++) {
-                                tandelArray.add(i, data.getTandelSpinner().get(i).getTandelName());
-                                tandelIdArray.add(i, data.getTandelSpinner().get(i).getTandelId());
-                            }
-                            for (int i = 0; i < data.getAuctionerSpinner().size(); i++) {
-                                auctionerArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerName());
-                                auctionerIdArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerId());
-                            }
-
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    tandelArray);
-                            spTandelName.setAdapter(spAdapterOwner);
-
-                            MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    auctionerArray);
-                            spAuctionerName.setAdapter(spAdapterTandel);
-
                             progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -770,7 +746,7 @@ public class EditTripFragment extends Fragment {
 
 
         } else {
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -780,7 +756,7 @@ public class EditTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();*/
 
             Log.e("Edit Trip : ", " NO Internet");

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,9 +15,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ats.blucatch.R;
+import com.ats.blucatch.bean.AddDevices;
+import com.ats.blucatch.bean.ErrorMessage;
 import com.ats.blucatch.bean.Login;
 import com.ats.blucatch.utils.CheckNetwork;
 import com.ats.blucatch.utils.InterfaceApi;
+import com.ats.blucatch.utils.SharedPrefManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -84,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if (data.getErrorMessage().getError()) {
                                         Log.e("USERDATA : ", "ERROR : " + data.getErrorMessage().getMessage());
                                         progressBar.dismiss();
-                                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(LoginActivity.this);
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                                         builder.setTitle("Alert");
                                         builder.setCancelable(false);
                                         builder.setMessage("" + data.getErrorMessage().getMessage());
@@ -94,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 dialog.dismiss();
                                             }
                                         });
-                                        android.app.AlertDialog dialog = builder.create();
+                                        AlertDialog dialog = builder.create();
                                         dialog.show();
 
                                     } else {
@@ -114,6 +118,8 @@ public class LoginActivity extends AppCompatActivity {
                                             finish();
 
                                         } else {
+                                            progressBar.dismiss();
+
                                             Log.e("USER :  ", "NOT ADMIN");
                                             SharedPreferences pref = getApplicationContext().getSharedPreferences(InterfaceApi.MY_PREF, MODE_PRIVATE);
                                             SharedPreferences.Editor editor = pref.edit();
@@ -123,9 +129,27 @@ public class LoginActivity extends AppCompatActivity {
                                             editor.putInt("AppCoId", data.getUser().getCoId());
                                             editor.apply();
 
-                                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                            progressBar.dismiss();
-                                            finish();
+                                            if (data.getUser().getBlockStatus() == 0) {
+                                                sendTokenToServer(data.getUser().getUserId(), data.getUser().getAccId(), data.getUser().getCoId());
+                                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+
+                                                finish();
+                                            } else {
+                                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
+                                                builder.setTitle("Alert");
+                                                builder.setCancelable(false);
+                                                builder.setMessage("You are blocked! \nsorry you cannot able to logged in");
+                                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                                AlertDialog dialog = builder.create();
+                                                dialog.show();
+                                            }
+
+
                                         }
                                     }
                                 } else {
@@ -139,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                                 progressBar.dismiss();
 
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(LoginActivity.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                                 builder.setTitle("Error");
                                 builder.setCancelable(false);
                                 builder.setMessage("Server Error!");
@@ -149,13 +173,13 @@ public class LoginActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 });
-                                android.app.AlertDialog dialog = builder.create();
+                                AlertDialog dialog = builder.create();
                                 dialog.show();
                             }
                         });
 
                     } else {
-                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(LoginActivity.this);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this, R.style.AlertDialogTheme);
                         builder.setTitle("Check Connectivity");
                         builder.setCancelable(false);
                         builder.setMessage("Please Connect to Internet");
@@ -165,13 +189,51 @@ public class LoginActivity extends AppCompatActivity {
                                 dialog.dismiss();
                             }
                         });
-                        android.app.AlertDialog dialog = builder.create();
+                        AlertDialog dialog = builder.create();
                         dialog.show();
                     }
                 }
 
             }
         });
+
+    }
+
+    private void sendTokenToServer(int userId, long accId, int coId) {
+
+        String token = SharedPrefManager.getmInstance(this).getDeviceToken();
+        AddDevices addDevices = new AddDevices(userId, accId, token, coId);
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        InterfaceApi api = retrofit.create(InterfaceApi.class);
+        Call<ErrorMessage> errorMessageCall = api.addDeviceToken(addDevices);
+        Log.e("Add Device : Parameters", " : " + addDevices);
+
+
+        errorMessageCall.enqueue(new Callback<ErrorMessage>() {
+            @Override
+            public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
+                if (response.body() != null) {
+
+                    ErrorMessage message = response.body();
+                    if (!message.getError()) {
+                        Log.e("sendTokenToServer", " : onResume : Success");
+                    } else {
+                        Log.e("sendTokenToServer", " : onResume : Failed : " + message.getMessage());
+                    }
+                } else {
+                    Log.e("sendTokenToServer", " : onResume : NULL ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ErrorMessage> call, Throwable t) {
+                Log.e("sendTokenToServer", " : onFailure : " + t.getMessage());
+            }
+        });
+
 
     }
 }

@@ -4,6 +4,7 @@ package com.ats.blucatch.fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -73,6 +74,8 @@ public class TripMasterFragment extends Fragment {
 
     private MyAdapter myAdapter;
 
+    int userId, coId;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -111,6 +114,21 @@ public class TripMasterFragment extends Fragment {
         MainActivity.isAtChangePass = false;
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
+        MainActivity.isAtTripMasterTripExp = false;
+        MainActivity.isAtTripMasterFishSell = false;
+        MainActivity.isAtTripMasterEnterTripExp = false;
+        MainActivity.isAtTripMasterEnterFishSell = false;
+
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
+
 
         lvTripMaster = view.findViewById(R.id.lvTripMaster);
         lvTripMaster.setScrollingCacheEnabled(false);
@@ -150,45 +168,6 @@ public class TripMasterFragment extends Fragment {
             }
         });
 
-
-      /*  tvTripExp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new TripExpenseViewFragment();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-            }
-        });
-        tvTripExpCount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new TripExpenseViewFragment();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-            }
-        });
-
-        tvFishSell.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new TripFishSellViewFragment();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-            }
-        });
-
-        tvFishSellCount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = new TripFishSellViewFragment();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-            }
-        });*/
 
         edSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -242,7 +221,7 @@ public class TripMasterFragment extends Fragment {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             InterfaceApi api = retrofit.create(InterfaceApi.class);
-            Call<TripData> tripDataCall = api.allTripData();
+            Call<TripData> tripDataCall = api.allTripDataBySeason(coId);
 
             progressBar = new ProgressDialog(getContext());
             progressBar.setCancelable(false);
@@ -255,37 +234,53 @@ public class TripMasterFragment extends Fragment {
             tripDataCall.enqueue(new Callback<TripData>() {
                 @Override
                 public void onResponse(Call<TripData> call, Response<TripData> response) {
-                    if (response.body() != null) {
+                    try {
+                        if (response.body() != null) {
 
-                        TripData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "Unable to fetch data!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            tripDisplayArray.clear();
-                            if (boatId == 0) {
-                                for (int i = 0; i < data.getTripDisplay().size(); i++) {
-                                    tripDisplayArray.add(i, data.getTripDisplay().get(i));
-                                }
+                            TripData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getErrorMessage().getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                //Toast.makeText(getContext(), "Unable to fetch data!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
                             } else {
-                                for (int i = 0, j = 0; i < data.getTripDisplay().size(); i++) {
-                                    if (data.getTripDisplay().get(i).getBoatId() == boatId) {
-                                        tripDisplayArray.add(j, data.getTripDisplay().get(i));
-                                        j++;
+                                tripDisplayArray.clear();
+                                if (boatId == 0) {
+                                    for (int i = 0; i < data.getTripDisplay().size(); i++) {
+                                        tripDisplayArray.add(i, data.getTripDisplay().get(i));
+                                    }
+                                } else {
+                                    for (int i = 0, j = 0; i < data.getTripDisplay().size(); i++) {
+                                        if (data.getTripDisplay().get(i).getBoatId() == boatId) {
+                                            tripDisplayArray.add(j, data.getTripDisplay().get(i));
+                                            j++;
+                                        }
                                     }
                                 }
+                                Log.e("ON RESPONSE : ", " DATA : " + tripDisplayArray);
+                                myAdapter = new MyAdapter(getContext(), tripDisplayArray);
+                                lvTripMaster.setAdapter(myAdapter);
+                                progressBar.dismiss();
                             }
-                            Log.e("ON RESPONSE : ", " DATA : " + tripDisplayArray);
-                            myAdapter = new MyAdapter(getContext(), tripDisplayArray);
-                            lvTripMaster.setAdapter(myAdapter);
-                            progressBar.dismiss();
-                        }
 
-                    } else {
+                        } else {
+                            progressBar.dismiss();
+                            //  Toast.makeText(getContext(), "Unable to fetch data!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
+                        }
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to fetch data!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -299,7 +294,7 @@ public class TripMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -309,17 +304,15 @@ public class TripMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public static long getDifferenceDays(Date d1, Date d2) {
         long diff = d2.getTime() - d1.getTime();
         return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
-
 
     public void getSpinnerDataforBoat() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -341,36 +334,37 @@ public class TripMasterFragment extends Fragment {
             boatDataCall.enqueue(new Callback<BoatData>() {
                 @Override
                 public void onResponse(Call<BoatData> call, Response<BoatData> response) {
+                    try {
+                        if (response.body() != null) {
+                            BoatData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                boatArray.clear();
+                                boatIdArray.clear();
+                                boatArray.add(0, "All");
+                                boatIdArray.add(0, 0l);
+                                for (int i = 0; i < data.getBoatDisp().size(); i++) {
+                                    boatArray.add((i + 1), data.getBoatDisp().get(i).getBoatName());
+                                    boatIdArray.add((i + 1), data.getBoatDisp().get(i).getBoatId());
+                                }
 
-                    if (response.body() != null) {
-                        BoatData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            boatArray.clear();
-                            boatIdArray.clear();
-                            boatArray.add(0, "All");
-                            boatIdArray.add(0, 0l);
-                            for (int i = 0; i < data.getBoatDisp().size(); i++) {
-                                boatArray.add((i + 1), data.getBoatDisp().get(i).getBoatName());
-                                boatIdArray.add((i + 1), data.getBoatDisp().get(i).getBoatId());
+                                Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        boatArray);
+                                spBoat.setAdapter(spAdapterOwner);
+                                progressBar1.dismiss();
                             }
 
-                            Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    boatArray);
-                            spBoat.setAdapter(spAdapterOwner);
-
-
+                        } else {
                             progressBar1.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
-                        progressBar1.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                    } catch (Exception e) {
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -383,18 +377,19 @@ public class TripMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-            builder.setTitle("Check Connectivity");
-            builder.setCancelable(false);
-            builder.setMessage("Please Connect to Internet");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            android.app.AlertDialog dialog = builder.create();
-            dialog.show();
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+//            builder.setTitle("Check Connectivity");
+//            builder.setCancelable(false);
+//            builder.setMessage("Please Connect to Internet");
+//            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            AlertDialog dialog = builder.create();
+//            dialog.show();
+            Log.e("Connection : ", " No Internet ");
         }
     }
 
@@ -434,49 +429,53 @@ public class TripMasterFragment extends Fragment {
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar3.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Error");
-                            builder.setCancelable(false);
-                            builder.setMessage("" + data.getMessage());
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
-                            //Toast.makeText(getContext(), "unable to delete trip!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar3.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Error");
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                //Toast.makeText(getContext(), "unable to delete trip!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar3.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("Trip deleted successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getAllTripData(0);
+                                        myAdapter.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
                             progressBar3.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("Trip deleted successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getAllTripData(0);
-                                    myAdapter.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            Toast.makeText(getContext(), "Unable to delete trip!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
-                        progressBar3.dismiss();
-                        Toast.makeText(getContext(), "Unable to delete trip!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                    } catch (Exception e) {
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -489,7 +488,7 @@ public class TripMasterFragment extends Fragment {
             });
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -499,7 +498,7 @@ public class TripMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -507,7 +506,6 @@ public class TripMasterFragment extends Fragment {
     private void clearArrayList() {
         tripDisplayArray.clear();
     }
-
 
     public class MyAdapter extends BaseAdapter implements Filterable {
 
@@ -574,21 +572,6 @@ public class TripMasterFragment extends Fragment {
                 holder = (ViewHolder) v.getTag();
             }
 
-          /*  v = inflater.inflate(R.layout.custom_trip_master, null);
-
-            TextView tvTripNo = v.findViewById(R.id.tvTripMaster_TripNo);
-            TextView tvStatus = v.findViewById(R.id.tvTripMaster_Status);
-            TextView tvBoatName = v.findViewById(R.id.tvTripMaster_BoatName);
-            TextView tvTandelCrew = v.findViewById(R.id.tvTripMaster_TandelCrew);
-            TextView tvStDate = v.findViewById(R.id.tvTripMaster_StDate);
-            TextView tvTripDays = v.findViewById(R.id.tvTripMaster_TripDays);
-            TextView tvTripExp = v.findViewById(R.id.tvTripMaster_TripExpenses);
-            TextView tvTripExpCount = v.findViewById(R.id.tvTripMaster_TripExpCount);
-            TextView tvFishSell = v.findViewById(R.id.tvTripMaster_FishSell);
-            TextView tvFishSellCount = v.findViewById(R.id.tvTripMaster_FishSellCount);
-
-            ImageView ivpopup = v.findViewById(R.id.ivTripMasterPopUp);
-*/
             Typeface lightFont = Typeface.createFromAsset(getContext().getAssets(), "sofiapro-light.otf");
             Typeface boldFont = Typeface.createFromAsset(getContext().getAssets(), "SofiaProBold.otf");
 
@@ -602,17 +585,6 @@ public class TripMasterFragment extends Fragment {
             holder.tvTripExpCount.setTypeface(lightFont);
             holder.tvFishSell.setTypeface(boldFont);
             holder.tvFishSellCount.setTypeface(lightFont);
-
-           /* tvTripNo.setTypeface(lightFont);
-            tvStatus.setTypeface(boldFont);
-            tvBoatName.setTypeface(lightFont);
-            tvTandelCrew.setTypeface(lightFont);
-            tvStDate.setTypeface(lightFont);
-            tvTripDays.setTypeface(lightFont);
-            tvTripExp.setTypeface(boldFont);
-            tvTripExpCount.setTypeface(lightFont);
-            tvFishSell.setTypeface(boldFont);
-            tvFishSellCount.setTypeface(lightFont);*/
 
             Date date1 = new Date(displayedValues.get(position).getTripStartDate());
             SimpleDateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
@@ -630,6 +602,92 @@ public class TripMasterFragment extends Fragment {
             holder.tvTandelCrew.setText("" + displayedValues.get(position).getTandelName() + " + " + crewIdStringArray.length);
             holder.tvStDate.setText("" + dateText);
             holder.tvTripDays.setText("");
+            holder.tvTripExpCount.setText("" + displayedValues.get(position).getExpenseCount() + "/-");
+            holder.tvFishSellCount.setText("" + displayedValues.get(position).getFishSellCount() + "/-");
+
+
+            holder.tvTripExp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Fragment adf = new TripMasterViewTripExpFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("Season_Id", displayedValues.get(position).getSeasonId());
+                    args.putString("Boat_Name", displayedValues.get(position).getBoatName());
+                    args.putLong("Trip_Id", displayedValues.get(position).getTripId());
+                    args.putLong("Boat_Id", displayedValues.get(position).getBoatId());
+                    args.putInt("Trip_Settle", displayedValues.get(position).getTripSettled());
+                    adf.setArguments(args);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
+
+                }
+            });
+
+            holder.tvTripExpCount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Fragment adf = new TripMasterViewTripExpFragment();
+                    Bundle args = new Bundle();
+                    args.putInt("Season_Id", displayedValues.get(position).getSeasonId());
+                    args.putString("Boat_Name", displayedValues.get(position).getBoatName());
+                    args.putLong("Trip_Id", displayedValues.get(position).getTripId());
+                    args.putLong("Boat_Id", displayedValues.get(position).getBoatId());
+                    args.putInt("Trip_Settle", displayedValues.get(position).getTripSettled());
+                    adf.setArguments(args);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
+                }
+            });
+
+            holder.tvFishSell.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Fragment adf = new TripMasterFishSellFragment();
+                    Bundle args = new Bundle();
+                    args.putString("Auctioner_Name", displayedValues.get(position).getAuctionerName());
+                    args.putInt("Season_Id", displayedValues.get(position).getSeasonId());
+                    args.putString("Boat_Name", displayedValues.get(position).getBoatName());
+                    args.putLong("Trip_Id", displayedValues.get(position).getTripId());
+                    args.putLong("Boat_Id", displayedValues.get(position).getBoatId());
+                    args.putInt("Trip_Settle", displayedValues.get(position).getTripSettled());
+                    adf.setArguments(args);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
+                }
+            });
+
+            holder.tvFishSellCount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Fragment adf = new TripMasterFishSellFragment();
+                    Bundle args = new Bundle();
+                    args.putString("Auctioner_Name", displayedValues.get(position).getAuctionerName());
+                    args.putInt("Season_Id", displayedValues.get(position).getSeasonId());
+                    args.putString("Boat_Name", displayedValues.get(position).getBoatName());
+                    args.putLong("Trip_Id", displayedValues.get(position).getTripId());
+                    args.putLong("Boat_Id", displayedValues.get(position).getBoatId());
+                    args.putInt("Trip_Settle", displayedValues.get(position).getTripSettled());
+                    adf.setArguments(args);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
+
+                }
+            });
+
+            if (displayedValues.get(position).getTripSettled() == 1) {
+                holder.ivpopup.setVisibility(View.GONE);
+
+                Date dt1 = new Date(displayedValues.get(position).getTripEndDate());
+                SimpleDateFormat dformat1 = new SimpleDateFormat("dd/MM/yyyy");
+                String dateTxt1 = dformat1.format(dt1);
+                System.out.println(dateTxt1);
+
+
+                Date t1 = new Date(displayedValues.get(position).getTripStartDate());
+                Date t2 = new Date(displayedValues.get(position).getTripEndDate());
+                holder.tvTripDays.setText("" + getDifferenceDays(t1, t2) + " days");
+
+            } else if (displayedValues.get(position).getTripSettled() == 0) {
+                holder.ivpopup.setVisibility(View.VISIBLE);
+                holder.tvTripDays.setText("");
+            }
+
 
             holder.ivpopup.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -651,7 +709,8 @@ public class TripMasterFragment extends Fragment {
                                 args.putLong("Trip_End_Date", displayedValues.get(position).getTripEndDate());
                                 args.putString("Trip_Staff_Count", displayedValues.get(position).getTripStaff());
                                 args.putString("Trip_Status", displayedValues.get(position).getTripStatus());
-
+                                args.putLong("Trip_Auctioner_Id", displayedValues.get(position).getTripAuctionerId());
+                                args.putLong("Trip_Tandel_Id", displayedValues.get(position).getTripTandelId());
 
                                 adf.setArguments(args);
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
@@ -662,7 +721,7 @@ public class TripMasterFragment extends Fragment {
                                     ft.replace(R.id.content_frame, fragment);
                                     ft.commit();*/
                             } else if (menuItem.getItemId() == R.id.item_trip_master_delete) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to delete trip?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -680,6 +739,13 @@ public class TripMasterFragment extends Fragment {
                                 AlertDialog dialog = builder.create();
                                 dialog.show();
                                 //Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
+                            } else if (menuItem.getItemId() == R.id.item_trip_master_settle) {
+                                Fragment adf = new TripMasterTripSettleFragment();
+                                Bundle args = new Bundle();
+                                args.putLong("Trip_Id", displayedValues.get(position).getTripId());
+                                args.putInt("Season_Id", displayedValues.get(position).getSeasonId());
+                                adf.setArguments(args);
+                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
                             }
                             return true;
                         }
@@ -714,7 +780,7 @@ public class TripMasterFragment extends Fragment {
                             String tandelName = originalValues.get(i).getTandelName();
                             String auctionerName = originalValues.get(i).getAuctionerName();
                             if (tripNo.toLowerCase().startsWith(charSequence.toString()) || status.toLowerCase().startsWith(charSequence.toString()) || boatName.toLowerCase().startsWith(charSequence.toString()) || tandelName.toLowerCase().startsWith(charSequence.toString()) || auctionerName.toLowerCase().startsWith(charSequence.toString())) {
-                                filteredArrayList.add(new TripDisplay(originalValues.get(i).getTripId(), originalValues.get(i).getBoatId(), originalValues.get(i).getTripStartDate(), originalValues.get(i).getTripEndDate(), originalValues.get(i).getTripTandelId(), originalValues.get(i).getTripAuctionerId(), originalValues.get(i).getTripStaff(), originalValues.get(i).getTripSettled(), originalValues.get(i).getTripStatus(), originalValues.get(i).getTripDelete(), originalValues.get(i).getBoatName(), originalValues.get(i).getTandelName(), originalValues.get(i).getAuctionerName(), originalValues.get(i).getCoId(), originalValues.get(i).getEnterDate(), originalValues.get(i).getEnterBy()));
+                                filteredArrayList.add(new TripDisplay(originalValues.get(i).getTripId(), originalValues.get(i).getBoatId(), originalValues.get(i).getTripStartDate(), originalValues.get(i).getTripEndDate(), originalValues.get(i).getTripTandelId(), originalValues.get(i).getTripAuctionerId(), originalValues.get(i).getTripStaff(), originalValues.get(i).getTripSettled(), originalValues.get(i).getTripStatus(), originalValues.get(i).getTripDelete(), originalValues.get(i).getBoatName(), originalValues.get(i).getTandelName(), originalValues.get(i).getAuctionerName(), originalValues.get(i).getCoId(), originalValues.get(i).getEnterDate(), originalValues.get(i).getEnterBy(), originalValues.get(i).getSeasonId(), originalValues.get(i).getExpenseCount(), originalValues.get(i).getFishSellCount()));
                             }
                         }
                         results.count = filteredArrayList.size();

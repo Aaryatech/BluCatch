@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,7 @@ public class EditUserFragment extends Fragment {
     private EditText edPass, edConfirmPass, edUserType, edUserName, edMobile;
     private TextInputLayout textPass, textConfirmPass, textUserType, textUserName, textMobile;
     private Button btnUpdate;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
 
     private ArrayList<Long> accIdArray = new ArrayList<>();
     private ArrayList<String> accTypeArray = new ArrayList<>();
@@ -94,11 +95,15 @@ public class EditUserFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         tvLabelUser = view.findViewById(R.id.tvEditUser_LabelUser);
 
@@ -190,45 +195,45 @@ public class EditUserFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
-
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            for (int i = 0, k = 0; i < data.getAccount().size(); i++) {
-                                if (!data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction")) {
-                                    accIdArray.add(k, data.getAccount().get(i).getAccId());
-                                    accTypeArray.add(k, data.getAccount().get(i).getAccType());
-                                    accNameArray.add(k, data.getAccount().get(i).getAccName());
-                                    empTypeArray.add(k, data.getAccount().get(i).getEmpType());
-                                    empMobileArray.add(k, data.getAccount().get(i).getEmpMobile());
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                for (int i = 0, k = 0; i < data.getAccount().size(); i++) {
+                                    if (!data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction")) {
+                                        accIdArray.add(k, data.getAccount().get(i).getAccId());
+                                        accTypeArray.add(k, data.getAccount().get(i).getAccType());
+                                        accNameArray.add(k, data.getAccount().get(i).getAccName());
+                                        empTypeArray.add(k, data.getAccount().get(i).getEmpType());
+                                        empMobileArray.add(k, data.getAccount().get(i).getEmpMobile());
+                                    }
                                 }
-                            }
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            MySpinnerAdapter spAdapterUser = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    accNameArray);
-                            spUser.setAdapter(spAdapterUser);
+                                Log.e("RESPONSE : ", " DATA : " + data.getAccount());
+                                MySpinnerAdapter spAdapterUser = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        accNameArray);
+                                spUser.setAdapter(spAdapterUser);
 
-                            String accName = null;
-                            for (int j = 0; j < accIdArray.size(); j++) {
-                                if (bAccId == accIdArray.get(j)) {
-                                    accName = accNameArray.get(j);
-                                    break;
+                                String accName = null;
+                                for (int j = 0; j < accIdArray.size(); j++) {
+                                    if (bAccId == accIdArray.get(j)) {
+                                        accName = accNameArray.get(j);
+                                        break;
+                                    }
                                 }
-                            }
-                            ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, accNameArray);
-                            mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spUser.setAdapter(mAdapter);
-                            if (!accName.equals(null)) {
-                                int spinnerPosition = mAdapter.getPosition(accName);
-                                spUser.setSelection(spinnerPosition);
-                            }
+                                ArrayAdapter<String> mAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, accNameArray);
+                                mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spUser.setAdapter(mAdapter);
+                                if (!accName.equals(null)) {
+                                    int spinnerPosition = mAdapter.getPosition(accName);
+                                    spUser.setSelection(spinnerPosition);
+                                }
 
-                            progressBar.dismiss();
+                                progressBar.dismiss();
 
                            /* String name = getArguments().getString("User_Name");
                             String pass = getArguments().getString("User_Password");
@@ -243,11 +248,15 @@ public class EditUserFragment extends Fragment {
                                 int spinnerPosition = adapter1.getPosition(name);
                                 spUser.setSelection(spinnerPosition);
                             }*/
-                        }
+                            }
 
-                    } else {
+                        } else {
+                            progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
+                        }
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -260,7 +269,7 @@ public class EditUserFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -270,11 +279,10 @@ public class EditUserFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public void editUserData(int id) {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -311,45 +319,50 @@ public class EditUserFragment extends Fragment {
 
                 Call<ErrorMessage> errorMessageCall = api.editUser(id, user);
 
-                progressBar = new ProgressDialog(getContext());
-                progressBar.setCancelable(false);
-                progressBar.setMessage("please wait....");
-                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar.setProgress(0);
-                progressBar.setMax(100);
-                progressBar.show();
+                progressBar1 = new ProgressDialog(getContext());
+                progressBar1.setCancelable(false);
+                progressBar1.setMessage("please wait....");
+                progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressBar1.setProgress(0);
+                progressBar1.setMax(100);
+                progressBar1.show();
 
                 errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                     @Override
                     public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                        if (response.body() != null) {
-                            ErrorMessage data = response.body();
-                            if (data.getError()) {
-                                progressBar.dismiss();
-                                Toast.makeText(getContext(), "Unable to update user.", Toast.LENGTH_SHORT).show();
-                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                        try {
+                            if (response.body() != null) {
+                                ErrorMessage data = response.body();
+                                if (data.getError()) {
+                                    progressBar1.dismiss();
+                                    Toast.makeText(getContext(), "Unable to update user.", Toast.LENGTH_SHORT).show();
+                                    Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                } else {
+                                    progressBar1.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("Success");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("user updated successfully.");
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            resetData();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
 
                             } else {
-                                progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Success");
-                                builder.setCancelable(false);
-                                builder.setMessage("user updated successfully.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        resetData();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
+                                progressBar1.dismiss();
+                                Toast.makeText(getContext(), "Unable to update user.", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "NO DATA");
                             }
-
-                        } else {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "Unable to update user.", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "NO DATA");
+                        } catch (Exception e) {
+                            progressBar1.dismiss();
+                            Log.e("Exception : ", "" + e.getMessage());
                         }
                     }
 
@@ -363,7 +376,7 @@ public class EditUserFragment extends Fragment {
             }
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -373,7 +386,7 @@ public class EditUserFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -382,6 +395,7 @@ public class EditUserFragment extends Fragment {
         edPass.setText("");
         edConfirmPass.setText("");
         spUser.requestFocus();
+        getUserListFromAccount();
 
     }
 }

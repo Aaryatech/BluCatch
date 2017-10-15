@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -45,6 +46,8 @@ public class UserTripExpenseFragment extends Fragment {
     private FloatingActionButton fab;
     public static String boatName;
     public static long tripId, boatId;
+    public static int seasonId;
+    int tripSettle = 0;
     public ProgressDialog progressBar;
     private ArrayList<TripExpensesData> expensesDataArray = new ArrayList<>();
     private MyTripExpAdapter myAdapter;
@@ -62,6 +65,9 @@ public class UserTripExpenseFragment extends Fragment {
             boatName = getArguments().getString("User_Trip_Boat_Name");
             tripId = getArguments().getLong("User_Trip_ID");
             boatId = getArguments().getLong("User_Trip_Boat_ID");
+            seasonId = getArguments().getInt("User_Trip_Season_Id");
+            tripSettle = getArguments().getInt("User_Trip_Settle");
+            Log.e("Trip Settle  : ", "" + tripSettle);
         } catch (Exception e) {
             Log.e("Bundle  : ", "no data found");
         }
@@ -73,6 +79,8 @@ public class UserTripExpenseFragment extends Fragment {
         MainActivity.isAtUserEnterTransaction = false;
         MainActivity.isAtUserFishSell = false;
         MainActivity.isAtUserTripExp = true;
+        MainActivity.isAtUserViewLedger=false;
+        MainActivity.isAtUserAccDetails=false;
 
 
         fab = view.findViewById(R.id.fabEnterExp);
@@ -109,6 +117,11 @@ public class UserTripExpenseFragment extends Fragment {
             }
         });
 
+        if (tripSettle == 1) {
+            fab.setVisibility(View.GONE);
+        } else {
+            fab.setVisibility(View.VISIBLE);
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,6 +132,7 @@ public class UserTripExpenseFragment extends Fragment {
                 args.putString("User_Trip_Boat_Name", boatName);
                 args.putLong("User_Trip_ID", tripId);
                 args.putLong("User_Trip_Boat_ID", boatId);
+                args.putInt("User_Trip_Season_Id", seasonId);
                 adf.setArguments(args);
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
 
@@ -151,60 +165,65 @@ public class UserTripExpenseFragment extends Fragment {
             tripExpensesListDataCall.enqueue(new Callback<TripExpensesListData>() {
                 @Override
                 public void onResponse(Call<TripExpensesListData> call, Response<TripExpensesListData> response) {
-                    if (response.body() != null) {
-                        TripExpensesListData data = response.body();
-                        if (data.getErrorMessage().getError()) {
+                    try {
+                        if (response.body() != null) {
+                            TripExpensesListData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getErrorMessage().getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
+
+                            } else {
+                                expensesDataArray.clear();
+                                for (int i = 0; i < data.getTripExpensesData().size(); i++) {
+                                    expensesDataArray.add(i, data.getTripExpensesData().get(i));
+                                }
+                                myAdapter = new MyTripExpAdapter(getContext(), expensesDataArray);
+                                lvTripExp.setAdapter(myAdapter);
+
+                                tvExp.setText("" + data.getTotalAmount() + "/-");
+
+                                progressBar.dismiss();
+
+                            }
+
+                        } else {
                             progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                            builder.setTitle("Error");
                             builder.setCancelable(false);
-                            builder.setMessage("" + data.getErrorMessage().getMessage());
+                            builder.setMessage("No Expenses Found!");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
-
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
-
-                        } else {
-                            expensesDataArray.clear();
-                            for (int i = 0; i < data.getTripExpensesData().size(); i++) {
-                                expensesDataArray.add(i, data.getTripExpensesData().get(i));
-                            }
-                            myAdapter = new MyTripExpAdapter(getContext(), expensesDataArray);
-                            lvTripExp.setAdapter(myAdapter);
-
-                            tvExp.setText("" + data.getTotalAmount() + "/-");
-
-                            progressBar.dismiss();
-
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                        builder.setTitle("Error");
-                        builder.setCancelable(false);
-                        builder.setMessage("No Expenses Found!");
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                        android.app.AlertDialog dialog = builder.create();
-                        dialog.show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<TripExpensesListData> call, Throwable t) {
                     progressBar.dismiss();
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                     builder.setTitle("Error");
                     builder.setCancelable(false);
                     builder.setMessage("Server Error");
@@ -214,7 +233,7 @@ public class UserTripExpenseFragment extends Fragment {
                             dialog.dismiss();
                         }
                     });
-                    android.app.AlertDialog dialog = builder.create();
+                    AlertDialog dialog = builder.create();
                     dialog.show();
 
                     Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
@@ -223,7 +242,7 @@ public class UserTripExpenseFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -233,11 +252,10 @@ public class UserTripExpenseFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public class MyTripExpAdapter extends BaseAdapter implements Filterable {
 

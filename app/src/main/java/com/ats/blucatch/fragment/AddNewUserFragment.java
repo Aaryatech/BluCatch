@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,7 @@ public class AddNewUserFragment extends Fragment {
     private EditText edPass, edConfirmPass, edUserType, edUserName, edMobile;
     private TextInputLayout textPass, textConfirmPass, textUserType, textUserName, textMobile;
     private Button btnSave, btnReset;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
 
     private ArrayList<Long> accIdArray = new ArrayList<>();
     private ArrayList<String> accTypeArray = new ArrayList<>();
@@ -91,11 +92,15 @@ public class AddNewUserFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         tvLabelUser = view.findViewById(R.id.tvAddUser_LabelUser);
 
@@ -165,7 +170,6 @@ public class AddNewUserFragment extends Fragment {
         return view;
     }
 
-
     public void getUserListFromAccount() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
 
@@ -186,36 +190,40 @@ public class AddNewUserFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
-
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
-                                if (!data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction")) {
-                                    accIdArray.add(j, data.getAccount().get(i).getAccId());
-                                    accTypeArray.add(j, data.getAccount().get(i).getAccType());
-                                    accNameArray.add(j, data.getAccount().get(i).getAccName());
-                                    empTypeArray.add(j, data.getAccount().get(i).getEmpType());
-                                    empMobileArray.add(j, data.getAccount().get(i).getEmpMobile());
-                                    j++;
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
+                                    if (!data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction")) {
+                                        accIdArray.add(j, data.getAccount().get(i).getAccId());
+                                        accTypeArray.add(j, data.getAccount().get(i).getAccType());
+                                        accNameArray.add(j, data.getAccount().get(i).getAccName());
+                                        empTypeArray.add(j, data.getAccount().get(i).getEmpType());
+                                        empMobileArray.add(j, data.getAccount().get(i).getEmpMobile());
+                                        j++;
+                                    }
                                 }
+                                Log.e("RESPONSE : ", " DATA : " + data.getAccount());
+                                MySpinnerAdapter spAdapterUser = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        accNameArray);
+                                spUser.setAdapter(spAdapterUser);
+
+                                progressBar.dismiss();
                             }
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            MySpinnerAdapter spAdapterUser = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    accNameArray);
-                            spUser.setAdapter(spAdapterUser);
 
+                        } else {
                             progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -228,7 +236,7 @@ public class AddNewUserFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -238,11 +246,10 @@ public class AddNewUserFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public void addNewUser() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -278,64 +285,69 @@ public class AddNewUserFragment extends Fragment {
 
                 Call<ErrorMessage> errorMessageCall = api.addUser(user);
 
-                progressBar = new ProgressDialog(getContext());
-                progressBar.setCancelable(false);
-                progressBar.setMessage("please wait....");
-                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar.setProgress(0);
-                progressBar.setMax(100);
-                progressBar.show();
+                progressBar1 = new ProgressDialog(getContext());
+                progressBar1.setCancelable(false);
+                progressBar1.setMessage("please wait....");
+                progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressBar1.setProgress(0);
+                progressBar1.setMax(100);
+                progressBar1.show();
 
                 errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                     @Override
                     public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                        if (response.body() != null) {
-                            ErrorMessage data = response.body();
-                            if (data.getError()) {
-                                progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Error");
-                                builder.setCancelable(false);
-                                builder.setMessage("" + data.getMessage());
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        resetData();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
-                                //Toast.makeText(getContext(), "Unable to add user.", Toast.LENGTH_SHORT).show();
-                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                        try {
+                            if (response.body() != null) {
+                                ErrorMessage data = response.body();
+                                if (data.getError()) {
+                                    progressBar1.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("Error");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("" + data.getMessage());
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            resetData();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                    //Toast.makeText(getContext(), "Unable to add user.", Toast.LENGTH_SHORT).show();
+                                    Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                } else {
+                                    progressBar1.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("Success");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("New user added successfully.");
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            resetData();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
 
                             } else {
-                                progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Success");
-                                builder.setCancelable(false);
-                                builder.setMessage("New user added successfully.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        resetData();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
+                                progressBar1.dismiss();
+                                Toast.makeText(getContext(), "Unable to add user.", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "NO DATA");
                             }
-
-                        } else {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "Unable to add user.", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "NO DATA");
+                        } catch (Exception e) {
+                            progressBar1.dismiss();
+                            Log.e("Exception : ", "" + e.getMessage());
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                        progressBar.dismiss();
+                        progressBar1.dismiss();
                         Toast.makeText(getContext(), "Unable to add user.", Toast.LENGTH_SHORT).show();
                         Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                     }
@@ -343,7 +355,7 @@ public class AddNewUserFragment extends Fragment {
             }
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -353,7 +365,7 @@ public class AddNewUserFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -364,6 +376,7 @@ public class AddNewUserFragment extends Fragment {
         edUserName.setText("");
         spUser.setSelection(0);
         spUser.requestFocus();
+        getUserListFromAccount();
 
     }
 

@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,11 +87,15 @@ public class AddFishFragment extends Fragment {
 
         MainActivity.tvTitle.setTypeface(boldFont);
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         tvLabelFishSize = view.findViewById(R.id.tvLabelAddFish_FishSize);
         tvLabelFishType = view.findViewById(R.id.tvLabelAddFish_FishType);
@@ -207,32 +212,37 @@ public class AddFishFragment extends Fragment {
                 errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                     @Override
                     public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                        if (response.body() != null) {
-                            ErrorMessage data = response.body();
-                            if (data.getError()) {
-                                progressBar.dismiss();
-                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                        try {
+                            if (response.body() != null) {
+                                ErrorMessage data = response.body();
+                                if (data.getError()) {
+                                    progressBar.dismiss();
+                                    Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                } else {
+                                    progressBar.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("Success");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("New fish added successfully.");
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            resetData();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
 
                             } else {
                                 progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Success");
-                                builder.setCancelable(false);
-                                builder.setMessage("New fish added successfully.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        resetData();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
+                                Log.e("ON RESPONSE : ", "NO DATA");
                             }
-
-                        } else {
+                        } catch (Exception e) {
                             progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", "NO DATA");
+                            Log.e("Exception : ", "" + e.getMessage());
                         }
                     }
 
@@ -245,7 +255,7 @@ public class AddFishFragment extends Fragment {
 
             }
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -255,7 +265,7 @@ public class AddFishFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 

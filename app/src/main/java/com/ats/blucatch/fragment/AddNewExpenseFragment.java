@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +48,7 @@ public class AddNewExpenseFragment extends Fragment {
     private Spinner spExpType, spAccType, spEntryType, spEntryAccess;
     private RadioButton rbYes, rbNo;
     private Button btnSave, btnReset, btnAddValues;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
     int photoStatus;
 
     private LinearLayout llComboValues;
@@ -56,7 +57,6 @@ public class AddNewExpenseFragment extends Fragment {
     private ArrayList<String> accTypeArray = new ArrayList<>();
     private ArrayList<String> entryTypeArray = new ArrayList<>();
     private ArrayList<String> entryAccessArray = new ArrayList<>();
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,11 +96,15 @@ public class AddNewExpenseFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         expTypeArray.clear();
         expTypeArray.add(0, "Select Type");
@@ -128,7 +132,6 @@ public class AddNewExpenseFragment extends Fragment {
         entryAccessArray.add(2, "Manager");
         entryAccessArray.add(3, "Auctioner");
         entryAccessArray.add(4, "Tandel");
-
 
         tvDispValues = view.findViewById(R.id.tvAddExp_tvDispValues);
         edValues = view.findViewById(R.id.edAddExp_Values);
@@ -233,7 +236,6 @@ public class AddNewExpenseFragment extends Fragment {
         return view;
     }
 
-
     public void addExpeneseData() {
 
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -294,34 +296,39 @@ public class AddNewExpenseFragment extends Fragment {
                         errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                             @Override
                             public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                                if (response.body() != null) {
-                                    ErrorMessage data = response.body();
-                                    if (data.getError()) {
-                                        progressBar.dismiss();
-                                        Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
-                                        Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                                try {
+                                    if (response.body() != null) {
+                                        ErrorMessage data = response.body();
+                                        if (data.getError()) {
+                                            progressBar.dismiss();
+                                            Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
+                                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                        } else {
+                                            progressBar.dismiss();
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                            builder.setTitle("Success");
+                                            builder.setCancelable(false);
+                                            builder.setMessage("New expense added successfully.");
+                                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    resetData();
+                                                }
+                                            });
+                                            AlertDialog dialog = builder.create();
+                                            dialog.show();
+                                        }
 
                                     } else {
                                         progressBar.dismiss();
-                                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                        builder.setTitle("Success");
-                                        builder.setCancelable(false);
-                                        builder.setMessage("New expense added successfully.");
-                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                resetData();
-                                            }
-                                        });
-                                        android.app.AlertDialog dialog = builder.create();
-                                        dialog.show();
+                                        Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
+                                        Log.e("ON RESPONSE : ", "NO DATA");
                                     }
-
-                                } else {
+                                } catch (Exception e) {
                                     progressBar.dismiss();
-                                    Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
-                                    Log.e("ON RESPONSE : ", "NO DATA");
+                                    Log.e("Exception : ", "" + e.getMessage());
                                 }
                             }
 
@@ -356,52 +363,57 @@ public class AddNewExpenseFragment extends Fragment {
 
                     Call<ErrorMessage> errorMessageCall = api.addExpenses(expense);
 
-                    progressBar = new ProgressDialog(getContext());
-                    progressBar.setCancelable(false);
-                    progressBar.setMessage("please wait....");
-                    progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    progressBar.setProgress(0);
-                    progressBar.setMax(100);
-                    progressBar.show();
+                    progressBar1 = new ProgressDialog(getContext());
+                    progressBar1.setCancelable(false);
+                    progressBar1.setMessage("please wait....");
+                    progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressBar1.setProgress(0);
+                    progressBar1.setMax(100);
+                    progressBar1.show();
 
                     errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                         @Override
                         public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                            if (response.body() != null) {
-                                ErrorMessage data = response.body();
-                                if (data.getError()) {
-                                    progressBar.dismiss();
-                                    Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
-                                    Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                            try {
+                                if (response.body() != null) {
+                                    ErrorMessage data = response.body();
+                                    if (data.getError()) {
+                                        progressBar1.dismiss();
+                                        Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
+                                        Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                    } else {
+                                        progressBar1.dismiss();
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                        builder.setTitle("Success");
+                                        builder.setCancelable(false);
+                                        builder.setMessage("New expense added successfully.");
+                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                resetData();
+                                            }
+                                        });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
 
                                 } else {
-                                    progressBar.dismiss();
-                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                    builder.setTitle("Success");
-                                    builder.setCancelable(false);
-                                    builder.setMessage("New expense added successfully.");
-                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                            resetData();
-                                        }
-                                    });
-                                    android.app.AlertDialog dialog = builder.create();
-                                    dialog.show();
+                                    progressBar1.dismiss();
+                                    Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
+                                    Log.e("ON RESPONSE : ", "NO DATA");
                                 }
-
-                            } else {
-                                progressBar.dismiss();
-                                Toast.makeText(getContext(), "unable to add expense!", Toast.LENGTH_SHORT).show();
-                                Log.e("ON RESPONSE : ", "NO DATA");
+                            } catch (Exception e) {
+                                progressBar1.dismiss();
+                                Log.e("Exception : ", "" + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ErrorMessage> call, Throwable t) {
                             Toast.makeText(getContext(), "unable to add expense! server error", Toast.LENGTH_SHORT).show();
-                            progressBar.dismiss();
+                            progressBar1.dismiss();
                             Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                         }
                     });
@@ -410,7 +422,7 @@ public class AddNewExpenseFragment extends Fragment {
 
             }
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -420,7 +432,7 @@ public class AddNewExpenseFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 
@@ -436,6 +448,5 @@ public class AddNewExpenseFragment extends Fragment {
         edValues.setText("");
         tvDispValues.setText("");
     }
-
 
 }

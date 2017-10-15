@@ -58,7 +58,7 @@ public class AccountMasterFragment extends Fragment {
     private ImageView ivpopup, ivFilter;
     private LinearLayout llFilter;
     private boolean flag = false;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
     private ListView lvAccount;
     private ArrayList<Account> accountArray = new ArrayList<>();
     private MyAdapter1 adapter1;
@@ -71,7 +71,6 @@ public class AccountMasterFragment extends Fragment {
         Typeface boldFont = Typeface.createFromAsset(getContext().getAssets(), "SofiaProBold.otf");
         MainActivity.tvTitle.setText("Account Master");
         MainActivity.tvTitle.setTypeface(boldFont);
-
 
         MainActivity.isAtHome = false;
         MainActivity.isAtFishMaster = false;
@@ -192,7 +191,6 @@ public class AccountMasterFragment extends Fragment {
         }
     }
 
-
     public void getAccountData(final String type) {
 
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -214,46 +212,50 @@ public class AccountMasterFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Toast.makeText(getContext(), "unable to fetch account data.", Toast.LENGTH_SHORT).show();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                accountArray.clear();
+                                if (type.equalsIgnoreCase("All")) {
+                                    for (int i = 0; i < data.getAccount().size(); i++) {
+                                        accountArray.add(i, data.getAccount().get(i));
+                                    }
+                                } else if (type.equalsIgnoreCase("User")) {
+                                    for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
+                                        if (data.getAccount().get(i).getAccType().equalsIgnoreCase("User"))
+                                            accountArray.add(j, data.getAccount().get(i));
+                                    }
+                                } else if (type.equalsIgnoreCase("Transaction")) {
+                                    for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
+                                        if (data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction"))
+                                            accountArray.add(j, data.getAccount().get(i));
+                                    }
+                                } else {
+                                    for (int i = 0; i < data.getAccount().size(); i++) {
+                                        accountArray.add(i, data.getAccount().get(i));
+                                    }
+                                }
+                                Log.e("RESPONSE : ", " DATA : " + data.getAccount());
+                                //setAdapterData();
+                                adapter1 = new MyAdapter1(getContext(), accountArray);
+                                lvAccount.setAdapter(adapter1);
+                                lvAccount.setTextFilterEnabled(true);
+                                progressBar.dismiss();
+                            }
 
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
+                        } else {
                             progressBar.dismiss();
                             Toast.makeText(getContext(), "unable to fetch account data.", Toast.LENGTH_SHORT).show();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            accountArray.clear();
-                            if (type.equalsIgnoreCase("All")) {
-                                for (int i = 0; i < data.getAccount().size(); i++) {
-                                    accountArray.add(i, data.getAccount().get(i));
-                                }
-                            } else if (type.equalsIgnoreCase("User")) {
-                                for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
-                                    if (data.getAccount().get(i).getAccType().equalsIgnoreCase("User"))
-                                        accountArray.add(j, data.getAccount().get(i));
-                                }
-                            } else if (type.equalsIgnoreCase("Transaction")) {
-                                for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
-                                    if (data.getAccount().get(i).getAccType().equalsIgnoreCase("Transaction"))
-                                        accountArray.add(j, data.getAccount().get(i));
-                                }
-                            } else {
-                                for (int i = 0; i < data.getAccount().size(); i++) {
-                                    accountArray.add(i, data.getAccount().get(i));
-                                }
-                            }
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            //setAdapterData();
-                            adapter1 = new MyAdapter1(getContext(), accountArray);
-                            lvAccount.setAdapter(adapter1);
-                            lvAccount.setTextFilterEnabled(true);
-                            progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Toast.makeText(getContext(), "unable to fetch account data.", Toast.LENGTH_SHORT).show();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -267,7 +269,7 @@ public class AccountMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -277,7 +279,7 @@ public class AccountMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -293,54 +295,59 @@ public class AccountMasterFragment extends Fragment {
 
             Call<ErrorMessage> errorMessageCall = api.deleteAccount(id);
 
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
+            progressBar1 = new ProgressDialog(getContext());
+            progressBar1.setCancelable(false);
+            progressBar1.setMessage("please wait....");
+            progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar1.setProgress(0);
+            progressBar1.setMax(100);
+            progressBar1.show();
 
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar1.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar1.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("Account deleted successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getAccountData("All");
+                                        // setAdapterData();
+                                        adapter1.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
-                            progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("Account deleted successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getAccountData("All");
-                                    // setAdapterData();
-                                    adapter1.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            progressBar1.dismiss();
+                            Toast.makeText(getContext(), "Unable to delete account!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
-                        progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to delete account!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                    } catch (Exception e) {
+                        progressBar1.dismiss();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                    progressBar.dismiss();
+                    progressBar1.dismiss();
                     Toast.makeText(getContext(), "Unable to delete account!", Toast.LENGTH_SHORT).show();
                     Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                 }
@@ -348,7 +355,7 @@ public class AccountMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -358,7 +365,7 @@ public class AccountMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -475,7 +482,7 @@ public class AccountMasterFragment extends Fragment {
 
                             } else if (menuItem.getItemId() == R.id.item_acc_delete) {
 
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to delete account?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -115,7 +116,7 @@ public class ChangePasswordFragment extends Fragment {
                             ErrorMessage data = response.body();
                             if (data.getError()) {
                                 progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
                                 builder.setTitle("Error");
                                 builder.setCancelable(false);
                                 builder.setMessage("" + data.getMessage());
@@ -125,11 +126,11 @@ public class ChangePasswordFragment extends Fragment {
                                         dialog.dismiss();
                                     }
                                 });
-                                android.app.AlertDialog dialog = builder.create();
+                                AlertDialog dialog = builder.create();
                                 dialog.show();
                             } else {
                                 progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
                                 builder.setTitle("Success");
                                 builder.setCancelable(false);
                                 builder.setMessage("password changed successfully.");
@@ -139,7 +140,7 @@ public class ChangePasswordFragment extends Fragment {
                                         dialog.dismiss();
                                     }
                                 });
-                                android.app.AlertDialog dialog = builder.create();
+                                AlertDialog dialog = builder.create();
                                 dialog.show();
                             }
 
@@ -162,7 +163,7 @@ public class ChangePasswordFragment extends Fragment {
         } else
 
         {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -172,7 +173,7 @@ public class ChangePasswordFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 

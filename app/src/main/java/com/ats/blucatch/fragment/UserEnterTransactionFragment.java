@@ -87,7 +87,7 @@ public class UserEnterTransactionFragment extends Fragment {
     String selectedImagePath;
 
     MySqliteHelper db;
-    int userId, coId;
+    int userId, coId, seasonId;
     private TextInputLayout textFromAcc, textToAcc, textRQTRate, textRQTQty, textRQTTotal, textRQTMRate, textRQTMQty, textRQTMTotal, textRQTMMisc, textAmount, textAmtOfType, textRemark;
     private TextView tvLabelExpType, tvLabelComboType, tvExpId, tvPhoto1, tvPhoto2, tvPhoto3, tvFromAccId, tvToAccId, tvToAccEntry, tvToAccAmt, tvToAccPhoto, tvFromAccAmt, tvToAccCombo;
     private EditText edFromAcc, edToAcc, edRQTRate, edRQTQty, edRQTTotal, edRQTMRate, edRQTMQty, edRQTMTotal, edRQTMMisc, edAmt, edTypeAmt, edRemark;
@@ -119,7 +119,7 @@ public class UserEnterTransactionFragment extends Fragment {
     private MyAdapter myAdapter;
     private MyAdapterRecAcc myAdapterRecAcc;
     Dialog dialog;
-    String type;
+    String type, userType;
     long tripId, boatId;
 
     final List<String> selectedStringArray = new ArrayList<>();
@@ -138,23 +138,30 @@ public class UserEnterTransactionFragment extends Fragment {
         MainActivity.isAtUserEnterTransaction = true;
         MainActivity.isAtUserFishSell = false;
         MainActivity.isAtUserTripExp = false;
+        MainActivity.isAtUserViewLedger=false;
+        MainActivity.isAtUserAccDetails=false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            userType = pref.getString("AppUserType", "");
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         try {
             tripId = getArguments().getLong("User_Trip_ID");
-            //boatId = getArguments().getLong("User_Trip_Boat_ID");
-            boatId = 0;
+            seasonId = getArguments().getInt("User_Trip_Season_Id");
+            boatId = getArguments().getLong("User_Trip_Boat_ID");
             type = getArguments().getString("Expense_Type");
         } catch (Exception e) {
             e.printStackTrace();
         }
         createFolder();
-        getFromToAccountData();
+        getFromToAccountData(userType);
         //getAccountList();
 
         tvExpId = view.findViewById(R.id.tvUserEnterExp_ExpId);
@@ -348,170 +355,6 @@ public class UserEnterTransactionFragment extends Fragment {
             }
         });
 
-
-      /*  spExpType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //Toast.makeText(getContext(), "ID : " + i, Toast.LENGTH_SHORT).show();
-                if (spExpType.getSelectedItemPosition() == 0) {
-                    tvExpId.setText("");
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-                    llPhoto.setVisibility(View.GONE);
-                } else if (expEntryArray.get(i).toString().equalsIgnoreCase("Rate-Qty-Total")) {
-                    tvExpId.setText("" + expIdArray.get(i));
-                    llRQT.setVisibility(View.VISIBLE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-
-                    if (expPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (expEntryArray.get(i).toString().equalsIgnoreCase("Rate-Qty-Total-Misc")) {
-                    tvExpId.setText("" + expIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.VISIBLE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-
-                    if (expPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (expEntryArray.get(i).toString().equalsIgnoreCase("Type-Amount")) {
-                    tvExpId.setText("" + expIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.VISIBLE);
-                    if (expComboTypeArray.get(i) == null) {
-                        Toast.makeText(getContext(), "No Data Found for this Expense", Toast.LENGTH_SHORT).show();
-                        lvType.setVisibility(View.GONE);
-                        setAdapterData("");
-                    } else {
-                        lvType.setVisibility(View.VISIBLE);
-                        setAdapterData(expComboTypeArray.get(i));
-                    }
-
-                    if (expPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (expEntryArray.get(i).toString().equalsIgnoreCase("Amount")) {
-                    tvExpId.setText("" + expIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.VISIBLE);
-                    llType.setVisibility(View.GONE);
-
-                    if (expPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                }
-            }
-            //Rate-Qty-Total, Type-Amount, Rate-Qty-Total, Rate-Qty-Total-Misc, Type-Amount, Type-Amount
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });*/
-
-        /*spExpType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //Toast.makeText(getContext(), "ID : " + i, Toast.LENGTH_SHORT).show();
-                if (spExpType.getSelectedItemPosition() == 0) {
-                    tvExpId.setText("");
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-                    llPhoto.setVisibility(View.GONE);
-                } else if (entryArray.get(i).toString().equalsIgnoreCase("Rate-Qty-Total")) {
-                    tvExpId.setText("" + longIdArray.get(i));
-                    llRQT.setVisibility(View.VISIBLE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-
-                    if (intPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (entryArray.get(i).toString().equalsIgnoreCase("Rate-Qty-Total-Misc")) {
-                    tvExpId.setText("" + longIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.VISIBLE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.GONE);
-
-                    if (intPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (entryArray.get(i).toString().equalsIgnoreCase("Type-Amount")) {
-                    tvExpId.setText("" + longIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.GONE);
-                    llType.setVisibility(View.VISIBLE);
-                    if (comboArray.get(i) == null) {
-                        Toast.makeText(getContext(), "No Data Found for this Expense", Toast.LENGTH_SHORT).show();
-                        lvType.setVisibility(View.GONE);
-                        setAdapterData("");
-                    } else {
-                        lvType.setVisibility(View.VISIBLE);
-                        setAdapterData(comboArray.get(i));
-                    }
-
-                    if (intPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                } else if (entryArray.get(i).toString().equalsIgnoreCase("Amount")) {
-                    tvExpId.setText("" + longIdArray.get(i));
-                    llRQT.setVisibility(View.GONE);
-                    llRQTM.setVisibility(View.GONE);
-                    llAmt.setVisibility(View.VISIBLE);
-                    llType.setVisibility(View.GONE);
-
-                    if (intPhotoArray.get(i) == 0) {
-                        llPhoto.setVisibility(View.VISIBLE);
-                    } else {
-                        llPhoto.setVisibility(View.GONE);
-                    }
-
-                }
-            }
-            //Rate-Qty-Total, Type-Amount, Rate-Qty-Total, Rate-Qty-Total-Misc, Type-Amount, Type-Amount
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });*/
-
-
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -525,51 +368,6 @@ public class UserEnterTransactionFragment extends Fragment {
                 resetData();
             }
         });
-
-
-       /* try {
-            String ids = pref.getString("Expenses_ID_Array", "");
-            String names = pref.getString("Expenses_Name_Array", "");
-            String entrys = pref.getString("Expenses_Entry_Array", "");
-            String comboValues = pref.getString("Expenses_Combo_Array", "");
-            String photos = pref.getString("Expenses_Photo_Array", "");
-
-            String[] tempIdArray = ids.split("#");
-            String[] tempNameArray = names.split("#");
-            String[] tempEntryArray = entrys.split("#");
-            String[] tempComboArray = comboValues.split("#");
-            String[] tempPhotoArray = photos.split("#");
-
-            List<String> idArray = new ArrayList<>();
-            idArray = Arrays.asList(tempIdArray);
-            nameArray = Arrays.asList(tempNameArray);
-            entryArray = Arrays.asList(tempEntryArray);
-            comboArray = Arrays.asList(tempComboArray);
-            photoArray = Arrays.asList(tempPhotoArray);
-
-            for (int i = 0; i < idArray.size(); i++) {
-                longIdArray.add(i, Long.parseLong(idArray.get(i)));
-                intPhotoArray.add(i, Integer.parseInt(photoArray.get(i)));
-            }
-
-            Log.e("Arraylist ID : ", " : " + longIdArray);
-            Log.e("Arraylist NAME : ", " : " + nameArray);
-            Log.e("Arraylist ENTRY : ", " : " + entryArray);
-            Log.e("Arraylist COMBO : ", " : " + comboArray);
-            Log.e("Arraylist Photo : ", " : " + intPhotoArray);
-
-
-            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                    getContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    nameArray);
-            spExpType.setAdapter(spAdapterOwner);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
 
         lvType.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -633,7 +431,7 @@ public class UserEnterTransactionFragment extends Fragment {
                 if (!tvToAccEntry.getText().toString().equalsIgnoreCase("na")) {
                     expId = Long.parseLong(tvToAccId.getText().toString().trim());
                 } else {
-                    expId = 0;
+                    expId = -1;
                 }
 
                 if (llAmt.getVisibility() == View.VISIBLE) {
@@ -644,7 +442,7 @@ public class UserEnterTransactionFragment extends Fragment {
                         double amt = Double.parseDouble(edAmt.getText().toString().trim());
                         if (amt > Double.parseDouble(tvFromAccAmt.getText().toString())) {
                             //Toast.makeText(getContext(), "insufficient amount", Toast.LENGTH_SHORT).show();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
                             builder.setMessage("insufficient amount");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -653,10 +451,10 @@ public class UserEnterTransactionFragment extends Fragment {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
                         } else {
-                            transaction = new Transaction(1, 0, fromAcc, toAcc, amt, "", tripId, expType, 0, 0, 0, 0, "na", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "na", 0, 0, "na", 0, 0, expId, coId, 0, userId, 1, boatId);
+                            transaction = new Transaction(seasonId, 0, fromAcc, toAcc, amt, "", tripId, expType, 0, 0, 0, 0, "na", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "na", 0, 0, "na", 0, 0, expId, coId, 0, userId, 1, boatId);
                         }
                     }
                 } else if (llRQT.getVisibility() == View.VISIBLE) {
@@ -676,7 +474,7 @@ public class UserEnterTransactionFragment extends Fragment {
 
                         if (total > Double.parseDouble(tvFromAccAmt.getText().toString())) {
                             //                            Toast.makeText(getContext(), "insufficient amount", Toast.LENGTH_SHORT).show();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
                             builder.setMessage("insufficient amount");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -685,11 +483,11 @@ public class UserEnterTransactionFragment extends Fragment {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
 
                         } else {
-                            transaction = new Transaction(1, 0, fromAcc, toAcc, total, "", tripId, expType, rate, qty, total, 0, "na", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "na", 0, 0, "na", 0, 0, expId, coId, 0, userId, 1, boatId);
+                            transaction = new Transaction(seasonId, 0, fromAcc, toAcc, total, "", tripId, expType, rate, qty, total, 0, "na", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "na", 0, 0, "na", 0, 0, expId, coId, 0, userId, 1, boatId);
                         }
                     }
                 } else if (llRQTM.getVisibility() == View.VISIBLE) {
@@ -713,7 +511,7 @@ public class UserEnterTransactionFragment extends Fragment {
                         double misc = Double.parseDouble(edRQTMMisc.getText().toString().trim());
                         if (total > Double.parseDouble(tvFromAccAmt.getText().toString())) {
 //                            Toast.makeText(getContext(), "insufficient amount", Toast.LENGTH_SHORT).show();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
                             builder.setMessage("insufficient amount");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -722,11 +520,11 @@ public class UserEnterTransactionFragment extends Fragment {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
 
                         } else {
-                            transaction = new Transaction(1, 0, fromAcc, toAcc, total, "", tripId, expType, rate, qty, total, misc, "", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "", 0, 0, "", 0, 0, expId, coId, 0, userId, 1, boatId);
+                            transaction = new Transaction(seasonId, 0, fromAcc, toAcc, total, "", tripId, expType, rate, qty, total, misc, "", remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "", 0, 0, "", 0, 0, expId, coId, 0, userId, 1, boatId);
                         }
                     }
                 } else if (llType.getVisibility() == View.VISIBLE) {
@@ -754,7 +552,7 @@ public class UserEnterTransactionFragment extends Fragment {
                         double amt = Double.parseDouble(edTypeAmt.getText().toString().trim());
                         if (amt > Double.parseDouble(tvFromAccAmt.getText().toString())) {
 //                            Toast.makeText(getContext(), "insufficient amount", Toast.LENGTH_SHORT).show();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
                             builder.setMessage("insufficient amount");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -763,15 +561,15 @@ public class UserEnterTransactionFragment extends Fragment {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
 
                         } else {
-                            transaction = new Transaction(1, 0, fromAcc, toAcc, amt, "", tripId, expType, 0, 0, 0, 0, selectedStringArray.toString(), remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "", 0, 0, "", 0, 0, expId, coId, 0, userId, 1, boatId);
+                            transaction = new Transaction(seasonId, 0, fromAcc, toAcc, amt, "", tripId, expType, 0, 0, 0, 0, selectedStringArray.toString(), remark, imageEncoded_1, imageEncoded_2, imageEncoded_3, userId, 0, 2, "", 0, 0, "", 0, 0, expId, coId, 0, userId, 1, boatId);
                         }
                     }
                 } else {
-                    transaction = new Transaction(1, 0, fromAcc, toAcc, 5456, "tr_type", 4000, "exp_type", 55, 23, 56633, 54545, "dsfdsfds", "sdfdsfds", "", "", "", userId, 0, 2, "na", 0, 0, "na", 0, 0, 0, coId, 0, userId, 1, boatId);
+                    transaction = new Transaction(seasonId, 0, fromAcc, toAcc, 5456, "tr_type", 4000, "exp_type", 55, 23, 56633, 54545, "dsfdsfds", "sdfdsfds", "", "", "", userId, 0, 2, "na", 0, 0, "na", 0, 0, -1, coId, 0, userId, 1, boatId);
                 }
 
 
@@ -798,60 +596,65 @@ public class UserEnterTransactionFragment extends Fragment {
                     errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                         @Override
                         public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                            if (response.body() != null) {
-                                ErrorMessage data = response.body();
-                                if (data.getError()) {
-                                    pbTransaction.dismiss();
-                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                    builder.setCancelable(false);
-                                    builder.setMessage("" + data.getMessage());
-                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    android.app.AlertDialog dialog = builder.create();
-                                    dialog.show();
+                            try {
+                                if (response.body() != null) {
+                                    ErrorMessage data = response.body();
+                                    if (data.getError()) {
+                                        pbTransaction.dismiss();
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                        builder.setCancelable(false);
+                                        builder.setMessage("" + data.getMessage());
+                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    } else {
+                                        pbTransaction.dismiss();
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                        builder.setTitle("Success");
+                                        builder.setCancelable(false);
+                                        builder.setMessage("Transaction success.");
+                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                getFromToAccountData(userType);
+                                                resetData();
+                                            }
+                                        });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
+
                                 } else {
                                     pbTransaction.dismiss();
-                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                    builder.setTitle("Success");
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                     builder.setCancelable(false);
-                                    builder.setMessage("Transaction success.");
+                                    builder.setTitle("Error");
+                                    builder.setMessage("Transaction failed!");
                                     builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
-                                            getFromToAccountData();
-                                            resetData();
                                         }
                                     });
-                                    android.app.AlertDialog dialog = builder.create();
+                                    AlertDialog dialog = builder.create();
                                     dialog.show();
                                 }
-
-                            } else {
+                            } catch (Exception e) {
                                 pbTransaction.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setCancelable(false);
-                                builder.setTitle("Error");
-                                builder.setMessage("Transaction failed!");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
+                                Log.e("Exception : ", "" + e.getMessage());
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ErrorMessage> call, Throwable t) {
                             pbTransaction.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
                             builder.setMessage("Server Error");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -860,7 +663,7 @@ public class UserEnterTransactionFragment extends Fragment {
                                     dialog.dismiss();
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
                         }
                     });
@@ -868,7 +671,7 @@ public class UserEnterTransactionFragment extends Fragment {
 
             }
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setCancelable(false);
             builder.setTitle("Check Connectivity");
             builder.setMessage("please check internet connection.");
@@ -878,162 +681,11 @@ public class UserEnterTransactionFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
             Log.e("Check Connectivity : ", " : NO Internet");
         }
     }
-
-
-  /*  public void getAllExpenseData() {
-        db = new MySqliteHelper(getContext());
-        if (CheckNetwork.isInternetAvailable(getContext())) {
-
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            InterfaceApi api = retrofit.create(InterfaceApi.class);
-            Call<ExpensesData> expensesDataCall = api.allExpenseData();
-
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
-
-            expensesDataCall.enqueue(new Callback<ExpensesData>() {
-                @Override
-                public void onResponse(Call<ExpensesData> call, Response<ExpensesData> response) {
-                    if (response.body() != null) {
-
-                        ExpensesData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            expNameArray.clear();
-                            expIdArray.clear();
-                            expEntryArray.clear();
-                            expComboTypeArray.clear();
-                            expPhotoArray.clear();
-
-                            expNameArray.add(0, "Select Expense Type");
-                            expIdArray.add(0, 0l);
-                            expEntryArray.add(0, "");
-                            expComboTypeArray.add(0, "");
-                            expPhotoArray.add(0, 2);
-                            for (int i = 0, j = 1; i < data.getExpenses().size(); i++) {
-                                expNameArray.add(j, data.getExpenses().get(i).getExpName());
-                                expIdArray.add(j, data.getExpenses().get(i).getExpId());
-                                expEntryArray.add(j, data.getExpenses().get(i).getExpEntryType());
-                                expComboTypeArray.add(j, data.getExpenses().get(i).getComboValues());
-                                expPhotoArray.add(j, data.getExpenses().get(i).getExpIsPhotoReq());
-                                j++;
-
-                            }
-
-                            String nameStr = "", idStr = "", entryStr = "", comboStr = "", photoStr = "";
-                            for (int j = 0; j < expNameArray.size(); j++) {
-                                nameStr = nameStr + expNameArray.get(j) + "#";
-                                idStr = idStr + expIdArray.get(j) + "#";
-                                entryStr = entryStr + expEntryArray.get(j) + "#";
-                                comboStr = comboStr + expComboTypeArray.get(j) + "#";
-                                photoStr = photoStr + expPhotoArray.get(j) + "#";
-                            }
-
-                            String finalStr = nameStr.substring(0, nameStr.length() - 1);
-                            String finalIdStr = idStr.substring(0, idStr.length() - 1);
-                            String finalEntryStr = entryStr.substring(0, entryStr.length() - 1);
-                            String finalComboStr = comboStr.substring(0, comboStr.length() - 1);
-                            String finalPhotoStr = photoStr.substring(0, photoStr.length() - 1);
-                            Log.e("STRING : ", " : " + finalStr + "\n Id : " + finalIdStr);
-
-                            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = pref.edit();
-                            editor.putString("Expenses_ID_Array", finalIdStr);
-                            editor.putString("Expenses_Name_Array", finalStr);
-                            editor.putString("Expenses_Entry_Array", finalEntryStr);
-                            editor.putString("Expenses_Combo_Array", finalComboStr);
-                            editor.putString("Expenses_Photo_Array", finalComboStr);
-                            editor.commit();
-
-                            Log.e("ON RESPONSE : ", " DATA : " + expEntryArray);
-                            //setAdapterData();
-
-
-                            MySpinnerAdapter spAdapter = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    expNameArray);
-                            spExpType.setAdapter(spAdapter);
-
-                            progressBar.dismiss();
-                        }
-
-                    } else {
-                        progressBar.dismiss();
-                        Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", " NO DATA ");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ExpensesData> call, Throwable t) {
-                    progressBar.dismiss();
-                    Toast.makeText(getContext(), "unable to fetch data! server error", Toast.LENGTH_SHORT).show();
-                    Log.e("ON Failure : ", " ERROR :  " + t.getMessage());
-                }
-            });
-
-        } else {
-            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-            try {
-                String ids = pref.getString("Expenses_ID_Array", "");
-                String names = pref.getString("Expenses_Name_Array", "");
-                String entrys = pref.getString("Expenses_Entry_Array", "");
-                String comboValues = pref.getString("Expenses_Combo_Array", "");
-                String photos = pref.getString("Expenses_Photo_Array", "");
-
-                String[] tempIdArray = ids.split("#");
-                String[] tempNameArray = names.split("#");
-                String[] tempEntryArray = entrys.split("#");
-                String[] tempComboArray = comboValues.split("#");
-                String[] tempPhotoArray = photos.split("#");
-
-                List<String> idArray = new ArrayList<>();
-                idArray = Arrays.asList(tempIdArray);
-                nameArray = Arrays.asList(tempNameArray);
-                entryArray = Arrays.asList(tempEntryArray);
-                comboArray = Arrays.asList(tempComboArray);
-                photoArray = Arrays.asList(tempPhotoArray);
-
-                for (int i = 0; i < idArray.size(); i++) {
-                    longIdArray.add(i, Long.parseLong(idArray.get(i)));
-                    intPhotoArray.add(i, Integer.parseInt(photoArray.get(i)));
-                }
-
-                Log.e("Arraylist ID : ", " : " + longIdArray);
-                Log.e("Arraylist Photo : ", " : " + intPhotoArray);
-
-
-                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                        getContext(),
-                        android.R.layout.simple_spinner_dropdown_item,
-                        nameArray);
-                spExpType.setAdapter(spAdapterOwner);
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-            Log.e("Check Connectivity : ", " : NO Internet");
-        }
-    }*/
 
     private void setAdapterData(String data) {
 
@@ -1127,9 +779,8 @@ public class UserEnterTransactionFragment extends Fragment {
         llAmt.setVisibility(View.GONE);
     }
 
-
     public void startDialog(final int camera, final int gallery) {
-        builder = new AlertDialog.Builder(getContext());
+        builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
         builder.setTitle("Choose");
         builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
             @Override
@@ -1150,7 +801,6 @@ public class UserEnterTransactionFragment extends Fragment {
         });
         builder.show();
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1366,56 +1016,6 @@ public class UserEnterTransactionFragment extends Fragment {
         }
     }
 
-
-  /*  public void getAccountList() {
-        if (CheckNetwork.isInternetAvailable(getContext())) {
-
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            InterfaceApi api = retrofit.create(InterfaceApi.class);
-            Call<AccountListData> accountListDataCall = api.allAccountListForTransaction();
-
-            progressBar1 = new ProgressDialog(getContext());
-            progressBar1.setCancelable(false);
-            progressBar1.setMessage("please wait....");
-            progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar1.setProgress(0);
-            progressBar1.setMax(100);
-            progressBar1.show();
-            accountListDataCall.enqueue(new Callback<AccountListData>() {
-                @Override
-                public void onResponse(Call<AccountListData> call, Response<AccountListData> response) {
-                    if (response.body() != null) {
-                        AccountListData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            showAccountArray.clear();
-                            for (int i = 0; i < data.getShowAccount().size(); i++) {
-                                showAccountArray.add(i, data.getShowAccount().get(i));
-                            }
-                            progressBar1.dismiss();
-                        }
-                    } else {
-                        progressBar1.dismiss();
-                        Log.e("ON RESPONSE : ", "NO DATA");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<AccountListData> call, Throwable t) {
-                    progressBar1.dismiss();
-                    Log.e("ON Failure : ", "ERROR : " + t.getMessage());
-                }
-            });
-        } else {
-            Log.e("Check Connectivity : ", " : NO Internet");
-        }
-    }*/
-
-
     public class MyAdapter extends BaseAdapter implements Filterable {
 
         private ArrayList<SenderAccount> originalValues;
@@ -1597,8 +1197,7 @@ public class UserEnterTransactionFragment extends Fragment {
         dialog.show();
     }
 
-
-    public void getFromToAccountData() {
+    public void getFromToAccountData(final String accessTo) {
 
         if (CheckNetwork.isInternetAvailable(getContext())) {
 
@@ -1606,7 +1205,7 @@ public class UserEnterTransactionFragment extends Fragment {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             InterfaceApi api = retrofit.create(InterfaceApi.class);
-            Call<TransactionAccountData> transactionAccountDataCall = api.allAccountBoatWise(boatId);
+            Call<TransactionAccountData> transactionAccountDataCall = api.allAccountTripWise(tripId, type);
 
             progressBar1 = new ProgressDialog(getContext());
             progressBar1.setCancelable(false);
@@ -1618,42 +1217,75 @@ public class UserEnterTransactionFragment extends Fragment {
             transactionAccountDataCall.enqueue(new Callback<TransactionAccountData>() {
                 @Override
                 public void onResponse(Call<TransactionAccountData> call, Response<TransactionAccountData> response) {
-                    if (response.body() != null) {
-                        TransactionAccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
+                    try {
+                        if (response.body() != null) {
+                            TransactionAccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                showAccountArray.clear();
+
+                                expNameArray.clear();
+                                expIdArray.clear();
+                                expEntryArray.clear();
+                                expComboTypeArray.clear();
+                                expPhotoArray.clear();
+
+                                receiverAccountArray.clear();
+
+                                for (int i = 0; i < data.getSenderAccount().size(); i++) {
+                                    showAccountArray.add(i, data.getSenderAccount().get(i));
+                                }
+
+                                if (accessTo.equalsIgnoreCase("Manager")) {
+                                    for (int j = 0; j < data.getReceiverAccount().size(); j++) {
+                                        if (data.getReceiverAccount().get(j).getExpAccess() == null || !data.getReceiverAccount().get(j).getExpAccess().equalsIgnoreCase("Admin") || data.getReceiverAccount().get(j).getExpAccess().isEmpty()) {
+                                            receiverAccountArray.add(data.getReceiverAccount().get(j));
+                                            Log.e("MANAGER : ", "" + data.getReceiverAccount().get(j).getExpName());
+                                        }
+                                    }
+                                } else if (accessTo.equalsIgnoreCase("Auctioner")) {
+                                    for (int j = 0; j < data.getReceiverAccount().size(); j++) {
+                                        if (data.getReceiverAccount().get(j).getExpAccess() == null || data.getReceiverAccount().get(j).getExpAccess().equalsIgnoreCase("Auctioner") || data.getReceiverAccount().get(j).getExpAccess().isEmpty()) {
+                                            receiverAccountArray.add(data.getReceiverAccount().get(j));
+                                            Log.e("AUCTIONER : ", "" + data.getReceiverAccount().get(j).getExpName());
+                                        }
+                                    }
+                                } else if (accessTo.equalsIgnoreCase("Tandel")) {
+                                    for (int j = 0; j < data.getReceiverAccount().size(); j++) {
+                                        if (data.getReceiverAccount().get(j).getExpAccess() == null || data.getReceiverAccount().get(j).getExpAccess().equalsIgnoreCase("Tandel") || data.getReceiverAccount().get(j).getExpAccess().isEmpty()) {
+                                            receiverAccountArray.add(data.getReceiverAccount().get(j));
+                                            Log.e("TANDEL : ", "" + data.getReceiverAccount().get(j).getExpName());
+                                        }
+                                    }
+                                } else {
+                                    for (int j = 0; j < data.getReceiverAccount().size(); j++) {
+//                                        expNameArray.add(j, data.getReceiverAccount().get(j).getExpName());
+//                                        expIdArray.add(j, data.getReceiverAccount().get(j).getExpId());
+//                                        expEntryArray.add(j, data.getReceiverAccount().get(j).getExpEntry());
+//                                        expComboTypeArray.add(j, data.getReceiverAccount().get(j).getExpCombo());
+//                                        expPhotoArray.add(j, data.getReceiverAccount().get(j).getExpPhoto());
+//                                        expAmtArray.add(j, data.getReceiverAccount().get(j).getExpAmount());
+
+                                        receiverAccountArray.add(data.getReceiverAccount().get(j));
+                                    }
+                                }
+
+
+                                progressBar1.dismiss();
+                            }
                         } else {
-                            showAccountArray.clear();
-
-                            expNameArray.clear();
-                            expIdArray.clear();
-                            expEntryArray.clear();
-                            expComboTypeArray.clear();
-                            expPhotoArray.clear();
-
-                            receiverAccountArray.clear();
-
-                            for (int i = 0; i < data.getSenderAccount().size(); i++) {
-                                showAccountArray.add(i, data.getSenderAccount().get(i));
-
-                            }
-
-                            for (int j = 0; j < data.getReceiverAccount().size(); j++) {
-                                expNameArray.add(j, data.getReceiverAccount().get(j).getExpName());
-                                expIdArray.add(j, data.getReceiverAccount().get(j).getExpId());
-                                expEntryArray.add(j, data.getReceiverAccount().get(j).getExpEntry());
-                                expComboTypeArray.add(j, data.getReceiverAccount().get(j).getExpCombo());
-                                expPhotoArray.add(j, data.getReceiverAccount().get(j).getExpPhoto());
-                                expAmtArray.add(j, data.getReceiverAccount().get(j).getExpAmount());
-
-                                receiverAccountArray.add(j, data.getReceiverAccount().get(j));
-                            }
                             progressBar1.dismiss();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-                    } else {
+                    } catch (
+                            Exception e)
+
+                    {
                         progressBar1.dismiss();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        e.printStackTrace();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -1663,11 +1295,12 @@ public class UserEnterTransactionFragment extends Fragment {
                     Log.e("ON Failure : ", "ERROR : " + t.getMessage());
                 }
             });
-        } else {
+        } else
+
+        {
             Log.e("Check Connectivity : ", " : NO Internet");
         }
     }
-
 
     public class MyAdapterRecAcc extends BaseAdapter implements Filterable {
 
@@ -1764,7 +1397,7 @@ public class UserEnterTransactionFragment extends Fragment {
                             String accName = originalValues.get(i).getExpName();
                             String accType = originalValues.get(i).getExpType();
                             if (accId.toLowerCase().startsWith(charSequence.toString()) || accName.toLowerCase().startsWith(charSequence.toString()) || accType.toLowerCase().startsWith(charSequence.toString())) {
-                                filteredArrayList.add(new ReceiverAccount(originalValues.get(i).getExpId(), originalValues.get(i).getExpName(), originalValues.get(i).getExpType(), originalValues.get(i).getExpEntry(), originalValues.get(i).getExpCombo(), originalValues.get(i).getExpPhoto(), originalValues.get(i).getExpAmount()));
+                                filteredArrayList.add(new ReceiverAccount(originalValues.get(i).getExpId(), originalValues.get(i).getExpName(), originalValues.get(i).getExpType(), originalValues.get(i).getExpEntry(), originalValues.get(i).getExpCombo(), originalValues.get(i).getExpPhoto(), originalValues.get(i).getExpAmount(), originalValues.get(i).getExpAccess()));
                             }
                         }
                         results.count = filteredArrayList.size();

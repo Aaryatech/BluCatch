@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,18 +85,24 @@ public class ViewAccountDetailsFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        accId = getArguments().getLong("Account_Id");
-        String date_type = getArguments().getString("Date_Type");
-        String view_type = getArguments().getString("View_Type");
-        long fromDate = getArguments().getLong("From_Date");
-        long toDate = getArguments().getLong("To_Date");
-        long todaysDate = getArguments().getLong("Todays_Date");
+        String date_type = "", view_type = "";
+        long fromDate = 0, toDate = 0, todaysDate = 0;
+        try {
+            accId = getArguments().getLong("Account_Id");
+            date_type = getArguments().getString("Date_Type");
+            view_type = getArguments().getString("View_Type");
+            fromDate = getArguments().getLong("From_Date");
+            toDate = getArguments().getLong("To_Date");
+            todaysDate = getArguments().getLong("Todays_Date");
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
 
         lvViewLedger = view.findViewById(R.id.lvAccDetails_ViewLedger);
-        tvLabelDate = view.findViewById(R.id.tvAccdetails_LabelDate);
-        tvLabelTitle = view.findViewById(R.id.tvAccdetails_LabelTitle);
-        tvLabelAmt = view.findViewById(R.id.tvAccdetails_LabelAmt);
+        tvLabelDate = view.findViewById(R.id.tvAccDetails_LabelDate);
+        tvLabelTitle = view.findViewById(R.id.tvAccDetails_LabelTitle);
+        tvLabelAmt = view.findViewById(R.id.tvAccDetails_LabelAmt);
 
         tvLabelDate.setTypeface(boldFont);
         tvLabelTitle.setTypeface(boldFont);
@@ -153,96 +160,100 @@ public class ViewAccountDetailsFragment extends Fragment {
             ledgerDataCall.enqueue(new Callback<LedgerData>() {
                 @Override
                 public void onResponse(Call<LedgerData> call, Response<LedgerData> response) {
-
-                    if (response.body() != null) {
-                        LedgerData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Error");
-                            builder.setCancelable(false);
-                            builder.setMessage("" + data.getErrorMessage());
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
-
-                            //Toast.makeText(getContext(), "unable to fetch account data.", Toast.LENGTH_SHORT).show();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            ledgerArray.clear();
-                            if (date.equalsIgnoreCase("today")) {
-                                Log.e("DATE : ", " TODAY : -----------------------------");
-                                for (int i = 0, j = 0; i < data.getLedger().size(); i++) {
-                                    Log.e("DATE : ", " TODAY : -----------------------------\nFrom Date : " + fDate + "\nTo Date : " + tDate);
-                                    if (data.getLedger().get(i).getTransactionDate() <= tDate && data.getLedger().get(i).getTransactionDate() >= fDate) {
-                                        if (view.equalsIgnoreCase("All")) {
-                                            Log.e("VIEW : ", " ALL : " + data.getLedger().get(i));
-                                            ledgerArray.add(j, data.getLedger().get(i));
-                                            j++;
-                                        } else if (data.getLedger().get(i).getType().equalsIgnoreCase(view)) {
-                                            Log.e("VIEW : ", "  : " + view + "   : " + data.getLedger().get(i));
-                                            ledgerArray.add(j, data.getLedger().get(i));
-                                            j++;
-                                        }
-                                    }
-                                }
-                            } else if (date.equalsIgnoreCase("fromTo")) {
-                                Log.e("DATE : ", " From To Date ");
-                                for (int i = 0, j = 0; i < data.getLedger().size(); i++) {
-                                    Log.e("DATE : ", " TODAY : -----------------------------\nFrom Date : " + fromDate + "\nTo Date : " + toDate);
-                                    if (data.getLedger().get(i).getTransactionDate() <= toDate && data.getLedger().get(i).getTransactionDate() >= fromDate) {
-                                        if (view.equalsIgnoreCase("All")) {
-                                            Log.e("VIEW : ", " ALL : " + data.getLedger().get(i));
-                                            ledgerArray.add(j, data.getLedger().get(i));
-                                            j++;
-                                        } else if (data.getLedger().get(i).getType().equalsIgnoreCase(view)) {
-                                            Log.e("VIEW : ", "  : " + view + "   : " + data.getLedger().get(i));
-                                            ledgerArray.add(j, data.getLedger().get(i));
-                                            j++;
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            //Log.e("RESPONSE : ", " DATA : " + data.getLedger());
-                            if (ledgerArray.size() <= 0) {
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("");
+                    try {
+                        if (response.body() != null) {
+                            LedgerData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Error");
                                 builder.setCancelable(false);
-                                builder.setMessage("No Entries Found !");
+                                builder.setMessage("" + data.getErrorMessage());
                                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
                                     }
                                 });
-                                android.app.AlertDialog dialog = builder.create();
+                                AlertDialog dialog = builder.create();
                                 dialog.show();
-                            } else {
-                                myLedgerAdapter = new MyLedgerAdapter(getContext(), ledgerArray);
-                                lvViewLedger.setAdapter(myLedgerAdapter);
-                                lvViewLedger.setTextFilterEnabled(true);
-                            }
-                            progressBar.dismiss();
-                        }
 
-                    } else {
+                                //Toast.makeText(getContext(), "unable to fetch account data.", Toast.LENGTH_SHORT).show();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                ledgerArray.clear();
+                                if (date.equalsIgnoreCase("today")) {
+                                    Log.e("DATE : ", " TODAY : -----------------------------");
+                                    for (int i = 0, j = 0; i < data.getLedger().size(); i++) {
+                                        Log.e("DATE : ", " TODAY : -----------------------------\nFrom Date : " + fDate + "\nTo Date : " + tDate);
+                                        if (data.getLedger().get(i).getTransactionDate() <= tDate && data.getLedger().get(i).getTransactionDate() >= fDate) {
+                                            if (view.equalsIgnoreCase("All")) {
+                                                Log.e("VIEW : ", " ALL : " + data.getLedger().get(i));
+                                                ledgerArray.add(j, data.getLedger().get(i));
+                                                j++;
+                                            } else if (data.getLedger().get(i).getType().equalsIgnoreCase(view)) {
+                                                Log.e("VIEW : ", "  : " + view + "   : " + data.getLedger().get(i));
+                                                ledgerArray.add(j, data.getLedger().get(i));
+                                                j++;
+                                            }
+                                        }
+                                    }
+                                } else if (date.equalsIgnoreCase("fromTo")) {
+                                    Log.e("DATE : ", " From To Date ");
+                                    for (int i = 0, j = 0; i < data.getLedger().size(); i++) {
+                                        Log.e("DATE : ", " TODAY : -----------------------------\nFrom Date : " + fromDate + "\nTo Date : " + toDate);
+                                        if (data.getLedger().get(i).getTransactionDate() <= toDate && data.getLedger().get(i).getTransactionDate() >= fromDate) {
+                                            if (view.equalsIgnoreCase("All")) {
+                                                Log.e("VIEW : ", " ALL : " + data.getLedger().get(i));
+                                                ledgerArray.add(j, data.getLedger().get(i));
+                                                j++;
+                                            } else if (data.getLedger().get(i).getType().equalsIgnoreCase(view)) {
+                                                Log.e("VIEW : ", "  : " + view + "   : " + data.getLedger().get(i));
+                                                ledgerArray.add(j, data.getLedger().get(i));
+                                                j++;
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                                //Log.e("RESPONSE : ", " DATA : " + data.getLedger());
+                                if (ledgerArray.size() <= 0) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("No Entries Found !");
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                } else {
+                                    myLedgerAdapter = new MyLedgerAdapter(getContext(), ledgerArray);
+                                    lvViewLedger.setAdapter(myLedgerAdapter);
+                                    lvViewLedger.setTextFilterEnabled(true);
+                                }
+                                progressBar.dismiss();
+                            }
+
+                        } else {
+                            progressBar.dismiss();
+                            Toast.makeText(getContext(), "No Entries Found", Toast.LENGTH_SHORT).show();
+                            Log.e("RESPONSE : ", " NO DATA");
+                        }
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Toast.makeText(getContext(), "No Entries Found", Toast.LENGTH_SHORT).show();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<LedgerData> call, Throwable t) {
                     progressBar.dismiss();
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                     builder.setTitle("Server Error");
                     builder.setCancelable(false);
                     builder.setMessage("No Entries Found !");
@@ -252,7 +263,7 @@ public class ViewAccountDetailsFragment extends Fragment {
                             dialog.dismiss();
                         }
                     });
-                    android.app.AlertDialog dialog = builder.create();
+                    AlertDialog dialog = builder.create();
                     dialog.show();
                     // Toast.makeText(getContext(), "unable to fetch account data! server error", Toast.LENGTH_SHORT).show();
                     Log.e("ON FAILURE : ", " ERROR : " + t.getMessage());
@@ -261,7 +272,7 @@ public class ViewAccountDetailsFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -271,12 +282,11 @@ public class ViewAccountDetailsFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 
     }
-
 
     public class MyLedgerAdapter extends BaseAdapter {
 

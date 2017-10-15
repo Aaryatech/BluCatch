@@ -54,7 +54,7 @@ public class BoatMasterFragment extends Fragment {
     private ImageView ivPopup1;
     private FloatingActionButton fab;
     private LinearLayout llBoat1;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1, progressBar2;
     private ListView lvBoatMaster;
     private ArrayAdapter<BoatDisp> adapter;
     private MyAdapter myAdapter;
@@ -205,28 +205,33 @@ public class BoatMasterFragment extends Fragment {
             boatDataCall.enqueue(new Callback<BoatData>() {
                 @Override
                 public void onResponse(Call<BoatData> call, Response<BoatData> response) {
-                    if (response.body() == null) {
-                        progressBar.dismiss();
-                        Log.e("On Response : ", " NO DATA");
-                        Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        BoatData data = response.body();
-                        if (data.getErrorMessage().getError()) {
+                    try {
+                        if (response.body() == null) {
                             progressBar.dismiss();
-                            Log.e("On Response : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            Log.e("On Response : ", " NO DATA");
                             Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
                         } else {
+                            BoatData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("On Response : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
+                            } else {
 
-                            for (int i = 0; i < data.getBoatDisp().size(); i++) {
-                                boatDispArray.add(i, data.getBoatDisp().get(i));
+                                for (int i = 0; i < data.getBoatDisp().size(); i++) {
+                                    boatDispArray.add(i, data.getBoatDisp().get(i));
+                                }
+                                Log.e("ON RESPONSE : ", "DATA : " + boatDispArray);
+                                myAdapter = new MyAdapter(getContext(), boatDispArray);
+                                lvBoatMaster.setAdapter(myAdapter);
+                                progressBar.dismiss();
                             }
-                            Log.e("ON RESPONSE : ", "DATA : " + boatDispArray);
-                            myAdapter = new MyAdapter(getContext(), boatDispArray);
-                            lvBoatMaster.setAdapter(myAdapter);
-                            progressBar.dismiss();
+
+
                         }
-
-
+                    } catch (Exception e) {
+                        progressBar.dismiss();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -240,7 +245,7 @@ public class BoatMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -250,11 +255,10 @@ public class BoatMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     private void blockUnblockBoatData(long boatId) {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -266,66 +270,71 @@ public class BoatMasterFragment extends Fragment {
 
             Call<ErrorMessage> errorMessageCall = api.blockUnblockBoat(boatId);
 
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
+            progressBar1 = new ProgressDialog(getContext());
+            progressBar1.setCancelable(false);
+            progressBar1.setMessage("please wait....");
+            progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar1.setProgress(0);
+            progressBar1.setMax(100);
+            progressBar1.show();
 
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            //Toast.makeText(getContext(), "Unable to block / unblock boat!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Error");
-                            builder.setCancelable(false);
-                            builder.setMessage("" + data.getMessage());
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar1.dismiss();
+                                //Toast.makeText(getContext(), "Unable to block / unblock boat!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Error");
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                            } else {
+                                progressBar1.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getAllBoatData();
+                                        myAdapter.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
-                            progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("" + data.getMessage());
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getAllBoatData();
-                                    myAdapter.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            progressBar1.dismiss();
+                            Toast.makeText(getContext(), "Unable to block / unblock boat!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
-                        progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to block / unblock boat!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                    } catch (Exception e) {
+                        progressBar1.dismiss();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                    progressBar.dismiss();
+                    progressBar1.dismiss();
                     Toast.makeText(getContext(), "Unable to block / unblock boat!", Toast.LENGTH_SHORT).show();
                     Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                 }
@@ -333,7 +342,7 @@ public class BoatMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -343,7 +352,7 @@ public class BoatMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 
@@ -360,62 +369,103 @@ public class BoatMasterFragment extends Fragment {
 
             Call<ErrorMessage> errorMessageCall = api.deleteBoat(id);
 
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
+            progressBar2 = new ProgressDialog(getContext());
+            progressBar2.setCancelable(false);
+            progressBar2.setMessage("please wait....");
+            progressBar2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar2.setProgress(0);
+            progressBar2.setMax(100);
+            progressBar2.show();
 
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar2.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setCancelable(false);
+                                builder.setTitle("Error");
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+//                            Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar2.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("Boat deleted successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getAllBoatData();
+                                        myAdapter.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
-                            progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
+                            progressBar2.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                             builder.setCancelable(false);
-                            builder.setMessage("Boat deleted successfully.");
+                            builder.setMessage("Unable to delete boat!");
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
-                                    clearArrayList();
-                                    getAllBoatData();
-                                    myAdapter.notifyDataSetChanged();
-                                    edSearch.setText("");
                                 }
                             });
-                            android.app.AlertDialog dialog = builder.create();
+                            AlertDialog dialog = builder.create();
                             dialog.show();
+                            // Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
-                        progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                    } catch (Exception e) {
+                        progressBar2.dismiss();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                    progressBar.dismiss();
-                    Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
+                    progressBar2.dismiss();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                    builder.setCancelable(false);
+                    builder.setMessage("Unable to delete boat!");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                    //Toast.makeText(getContext(), "Unable to delete boat!", Toast.LENGTH_SHORT).show();
                     Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                 }
             });
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -425,7 +475,7 @@ public class BoatMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -565,7 +615,7 @@ public class BoatMasterFragment extends Fragment {
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
 
                             } else if (menuItem.getItemId() == R.id.item_boat_block_unblock) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 if (displayedValues.get(position).getBlockStatus() == 0) {
                                     builder.setMessage("Do you really want to block boat?");
@@ -593,6 +643,7 @@ public class BoatMasterFragment extends Fragment {
                                 Fragment adf = new TripDetailsFragment();
                                 Bundle args = new Bundle();
                                 args.putLong("Boat_Id", displayedValues.get(position).getBoatId());
+                                args.putString("Boat_Name", displayedValues.get(position).getBoatName());
                                 adf.setArguments(args);
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
                             } else if (menuItem.getItemId() == R.id.item_boat_expenses) {
@@ -603,7 +654,7 @@ public class BoatMasterFragment extends Fragment {
                                 adf.setArguments(args);
                                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
                             } else if (menuItem.getItemId() == R.id.item_boat_delete) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to delete boat?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

@@ -61,6 +61,7 @@
         android:orientation="vertical">
 
         <Button
+            android:layout_marginBottom="15dp"
             android:id="@+id/btnLoginSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,6 +73,7 @@
             android:typeface="serif" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/tvForgotPass"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

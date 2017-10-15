@@ -43,7 +43,6 @@
             android:drawableLeft="@mipmap/auctioner"
             android:drawablePadding="20dp"
             android:gravity="center_vertical"
-            android:text="Sagar Saindane"
             android:textSize="18sp" />
 
         <LinearLayout
@@ -79,7 +78,6 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginTop="2dp"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="1434534"
                     android:textColor="@color/colorWhite"
                     android:textSize="23sp" />
 
@@ -112,126 +110,36 @@
                     android:layout_marginBottom="2dp"
                     android:layout_marginTop="2dp"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="150000233000/-"
                     android:textColor="@color/colorWhite"
                     android:textSize="23sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/llHomeFishSell_Head"
-        android:layout_marginTop="5dp">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/lvHomeFishSell_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:divider="#00000000"
+            android:dividerHeight="2dp" />
 
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:elevation="2dp"
-                app:cardElevation="5dp">
+    </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="vertical">
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabHomeEnterFishExp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/icon_add_white"
+        android:tint="@color/colorWhite"
+        app:backgroundTint="@android:color/holo_red_light" />
 
-                    <TextView
-                        android:id="@+id/tvHomeFishSell_Date1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/holo_red_light"
-                        android:maxLines="1"
-                        android:singleLine="true"
-                        android:text=" 25 July 2017 "
-                        android:textColor="@color/colorWhite"
-                        android:textSize="15dp" />
-
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="2dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvHomeFishSell_Fish1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Shark dsfdsfds dsfsdffgdfgdfgfdgdfgdfg    "
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:id="@+id/tvHomeFishSell_Size1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="end"
-                            android:text="4 to 5 kg."
-                            android:textSize="16sp" />
-
-
-                    </LinearLayout>
-
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="2dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="2"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/tvHomeFishSell_LabelQty1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Qty : "
-                                android:textSize="15sp" />
-
-                            <TextView
-                                android:id="@+id/tvHomeFishSell_Qty1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="100"
-                                android:textSize="16sp" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvHomeFishSell_Amt1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="end"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="5000 /-"
-                            android:textSize="22sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-        </LinearLayout>
-    </ScrollView>
 </RelativeLayout>

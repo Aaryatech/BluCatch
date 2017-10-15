@@ -185,7 +185,6 @@
                         android:maxLines="1"
                         android:padding="10dp"
                         android:singleLine="true"
-                        android:text="25000"
                         android:textColor="@color/colorWhite"
                         android:textSize="22sp" />
 
@@ -201,7 +200,6 @@
                         android:maxLines="1"
                         android:padding="10dp"
                         android:singleLine="true"
-                        android:text="100000"
                         android:textColor="@color/colorWhite"
                         android:textSize="22sp" />
 

@@ -24,17 +24,23 @@ import android.widget.TextView;
 
 import com.ats.blucatch.R;
 import com.ats.blucatch.fragment.AccountMasterFragment;
+import com.ats.blucatch.fragment.AddNotification;
+import com.ats.blucatch.fragment.BoatExpensesFragment;
 import com.ats.blucatch.fragment.BoatMasterFragment;
 import com.ats.blucatch.fragment.ChangePasswordFragment;
 import com.ats.blucatch.fragment.ExpenseMasterFragment;
 import com.ats.blucatch.fragment.FishMasterFragment;
 import com.ats.blucatch.fragment.HomeFragment;
 import com.ats.blucatch.fragment.NotificationFragment;
+import com.ats.blucatch.fragment.SeasonMasterFragment;
 import com.ats.blucatch.fragment.TripDetailsFragment;
+import com.ats.blucatch.fragment.TripMasterFishSellFragment;
 import com.ats.blucatch.fragment.TripMasterFragment;
+import com.ats.blucatch.fragment.TripMasterViewTripExpFragment;
 import com.ats.blucatch.fragment.UserHomeFragment;
 import com.ats.blucatch.fragment.UserMasterFragment;
 import com.ats.blucatch.fragment.UserTripExpenseFragment;
+import com.ats.blucatch.fragment.UserViewLedgerFragment;
 import com.ats.blucatch.fragment.ViewLedgerFragment;
 import com.ats.blucatch.utils.InterfaceApi;
 
@@ -42,11 +48,11 @@ import com.ats.blucatch.utils.InterfaceApi;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public static boolean isAtHome = true, isAtFishMaster = false, isAtAddFish = false, isAtEditFish = false, isAtBoatMaster = false, isAtAddBoat = false, isAtEditBoat = false, isAtTripDetails = false, isAtTripMaster = false, isAtAddTrip = false, isAtEditTrip = false, isAtBoatExpense = false, isAtBoatDetails = false, isAtBoatTripExp = false, isAtNotification = false, isAtTripExpView = false, isAtTripFishSell = false, isAtAccMaster = false, isAtAddAcc = false, isAtViewLedger = false, isAtAccDetails = false, isAtUserMaster = false, isAtAddUser = false, isAtExpMaster = false, isAtAddExp = false, isAtChangePass = false, isAtHomeTripExp = false, isAtHomeFishSell = false, isAtAddNewAcc = false;
+    public static boolean isAtHome = true, isAtFishMaster = false, isAtAddFish = false, isAtEditFish = false, isAtBoatMaster = false, isAtAddBoat = false, isAtEditBoat = false, isAtTripDetails = false, isAtTripMaster = false, isAtAddTrip = false, isAtEditTrip = false, isAtBoatExpense = false, isAtBoatDetails = false, isAtBoatTripExp = false, isAtNotification = false, isAtTripExpView = false, isAtTripFishSell = false, isAtAccMaster = false, isAtAddAcc = false, isAtViewLedger = false, isAtAccDetails = false, isAtUserMaster = false, isAtAddUser = false, isAtExpMaster = false, isAtAddExp = false, isAtChangePass = false, isAtHomeTripExp = false, isAtHomeFishSell = false, isAtAddNewAcc = false, isAtBoatEnterExp = false, isAtSeasonMaster = false, isAtAddSeason = false, isAtTripMasterTripExp = false, isAtTripMasterFishSell = false, isAtTripMasterEnterTripExp = false, isAtTripMasterEnterFishSell = false, isAtAddNotification = false, isAtUserViewLedger = false, isAtUserAccDetails = false;
     public static boolean isAtUserTripExp = false, isAtUserFishSell = false, isAtUserEnterTransaction = false;
 
     private LinearLayout llAdminMenu, llUserMenu, llManagerMenu;
-    private TextView tvMenuAddAccount, tvMenuUserMgmt, tvMenuBoatMaster, tvMenuFishMaster, tvMenuTripMaster, tvMenuShowExpenses, tvMenuViewLedger, tvMenuChangePassword, tvMenuLogout, tvMenuSendNotification, tvMenuTransactionMaster, tvUserLogout, tvUserChangePass, tvManagerBoatMaster, tvManagerTripMaster, tvManagerFishMaster, tvManagerChangePass, tvManagerViewLedger, tvManagerLogout;
+    private TextView tvMenuAddSeason, tvMenuAddAccount, tvMenuUserMgmt, tvMenuBoatMaster, tvMenuFishMaster, tvMenuTripMaster, tvMenuShowExpenses, tvMenuViewLedger, tvMenuChangePassword, tvMenuLogout, tvMenuSendNotification, tvMenuTransactionMaster, tvUserLogout, tvUserChangePass, tvManagerBoatMaster, tvManagerTripMaster, tvManagerFishMaster, tvManagerChangePass, tvManagerViewLedger, tvManagerLogout, tvUserViewLedger, tvMenuTransaction;
     public static TextView tvTitle;
 
     String appUserType;
@@ -122,6 +128,7 @@ public class MainActivity extends AppCompatActivity
             llUserMenu.setVisibility(View.VISIBLE);
         }
 
+        tvMenuAddSeason = (TextView) findViewById(R.id.tvMenuAddSeason);
         tvMenuAddAccount = (TextView) findViewById(R.id.tvMenuAddAccount);
         tvMenuUserMgmt = (TextView) findViewById(R.id.tvMenuUserMgmt);
         tvMenuBoatMaster = (TextView) findViewById(R.id.tvMenuBoatMaster);
@@ -136,6 +143,7 @@ public class MainActivity extends AppCompatActivity
 
         tvUserLogout = (TextView) findViewById(R.id.tvMenuUserLogout);
         tvUserChangePass = (TextView) findViewById(R.id.tvMenuUserChangePassword);
+        tvUserViewLedger = (TextView) findViewById(R.id.tvMenuUserViewLedger);
 
         tvManagerBoatMaster = (TextView) findViewById(R.id.tvMenuManagerBoatMaster);
         tvManagerFishMaster = (TextView) findViewById(R.id.tvMenuManagerFishMaster);
@@ -144,7 +152,11 @@ public class MainActivity extends AppCompatActivity
         tvManagerViewLedger = (TextView) findViewById(R.id.tvMenuManagerViewLedger);
         tvManagerLogout = (TextView) findViewById(R.id.tvMenuManagerLogout);
 
+        tvMenuViewLedger.setVisibility(View.GONE);
+        //tvMenuShowExpenses.setVisibility(View.GONE);
+       // tvMenuTransactionMaster.setVisibility(View.GONE);
 
+        tvMenuAddSeason.setTypeface(boldFont);
         tvMenuAddAccount.setTypeface(boldFont);
         tvMenuUserMgmt.setTypeface(boldFont);
         tvMenuBoatMaster.setTypeface(boldFont);
@@ -156,6 +168,22 @@ public class MainActivity extends AppCompatActivity
         tvMenuLogout.setTypeface(boldFont);
         tvMenuSendNotification.setTypeface(boldFont);
         tvMenuTransactionMaster.setTypeface(boldFont);
+
+
+        tvMenuAddSeason.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Fragment fragment = new SeasonMasterFragment();
+                if (fragment != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, fragment);
+                    ft.commit();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
 
         tvMenuAddAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,7 +293,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                 builder.setTitle("Logout from Application ?");
                 builder.setMessage("Do you want to logout ?");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -292,6 +320,20 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
+            }
+        });
+
+        tvMenuSendNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment = new AddNotification();
+                if (fragment != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, fragment);
+                    ft.commit();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
             }
         });
 
@@ -313,7 +355,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                 builder.setTitle("Logout from Application ?");
                 builder.setMessage("Do you want to logout ?");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -340,6 +382,20 @@ public class MainActivity extends AppCompatActivity
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
+            }
+        });
+
+        tvUserViewLedger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment = new UserViewLedgerFragment();
+                if (fragment != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, fragment);
+                    ft.commit();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
             }
         });
 
@@ -399,12 +455,26 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        tvManagerViewLedger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment = new UserViewLedgerFragment();
+                if (fragment != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, fragment);
+                    ft.commit();
+                }
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
+
 
         tvManagerLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                 builder.setTitle("Logout from Application ?");
                 builder.setMessage("Do you want to logout ?");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -462,12 +532,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
+
             if (isAtHome) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                 builder.setTitle("Confirm Action");
                 builder.setMessage("Do you really want to exit?");
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -944,7 +1017,157 @@ public class MainActivity extends AppCompatActivity
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_frame, fragment);
                 ft.commit();
+            } else if (isAtBoatEnterExp) {
+                Fragment fragment = new BoatExpensesFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtAddSeason) {
+                Fragment fragment = new SeasonMasterFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtSeasonMaster) {
+                if (appUserType.equalsIgnoreCase("Admin")) {
+                    llAdminMenu.setVisibility(View.VISIBLE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    Fragment fragment = new HomeFragment();
+
+                    if (fragment != null) {
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.content_frame, fragment);
+                        ft.commit();
+                    }
+                } else if (appUserType.equalsIgnoreCase("Tandel")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Manager")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.VISIBLE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Auctioner")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                }
+            } else if (isAtTripMasterTripExp) {
+                Fragment fragment = new TripMasterFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtTripMasterFishSell) {
+                Fragment fragment = new TripMasterFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtTripMasterEnterTripExp) {
+                Fragment fragment = new TripMasterViewTripExpFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtTripMasterEnterFishSell) {
+                Fragment fragment = new TripMasterFishSellFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+            } else if (isAtAddNotification) {
+                if (appUserType.equalsIgnoreCase("Admin")) {
+                    llAdminMenu.setVisibility(View.VISIBLE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    Fragment fragment = new HomeFragment();
+
+                    if (fragment != null) {
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.content_frame, fragment);
+                        ft.commit();
+                    }
+                } else if (appUserType.equalsIgnoreCase("Tandel")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Manager")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.VISIBLE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Auctioner")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                }
+            } else if (isAtUserViewLedger) {
+                if (appUserType.equalsIgnoreCase("Admin")) {
+                    llAdminMenu.setVisibility(View.VISIBLE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    Fragment fragment = new HomeFragment();
+
+                    if (fragment != null) {
+                        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(R.id.content_frame, fragment);
+                        ft.commit();
+                    }
+                } else if (appUserType.equalsIgnoreCase("Tandel")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Manager")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.VISIBLE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else if (appUserType.equalsIgnoreCase("Auctioner")) {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content_frame, new UserHomeFragment());
+                    ft.commit();
+                } else {
+                    llAdminMenu.setVisibility(View.GONE);
+                    llManagerMenu.setVisibility(View.GONE);
+                    llUserMenu.setVisibility(View.VISIBLE);
+                }
+            } else if (isAtUserAccDetails) {
+                Fragment fragment = new UserViewLedgerFragment();
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
             }
+
         }
     }
 

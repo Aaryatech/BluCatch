@@ -53,7 +53,7 @@ public class ExpenseMasterFragment extends Fragment {
     private FloatingActionButton fab;
     private ImageView ivPopup;
     private ListView lvExpenseMaster;
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
     private ArrayList<Expense> expenseArray = new ArrayList<>();
     private ArrayAdapter<Expense> adapter;
     private MyAdapter adapter1;
@@ -133,7 +133,6 @@ public class ExpenseMasterFragment extends Fragment {
         return view;
     }
 
-
     public static void setForceShowIcon(PopupMenu popupMenu) {
         try {
             Field[] fields = popupMenu.getClass().getDeclaredFields();
@@ -153,7 +152,6 @@ public class ExpenseMasterFragment extends Fragment {
             e.printStackTrace();
         }
     }
-
 
     public void getAllExpenseData() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -175,30 +173,35 @@ public class ExpenseMasterFragment extends Fragment {
             expensesDataCall.enqueue(new Callback<ExpensesData>() {
                 @Override
                 public void onResponse(Call<ExpensesData> call, Response<ExpensesData> response) {
-                    if (response.body() != null) {
+                    try {
+                        if (response.body() != null) {
 
-                        ExpensesData data = response.body();
-                        if (data.getErrorMessage().getError()) {
+                            ExpensesData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                expenseArray.clear();
+                                for (int i = 0; i < data.getExpenses().size(); i++) {
+                                    expenseArray.add(i, data.getExpenses().get(i));
+                                }
+                                Log.e("ON RESPONSE : ", " DATA : " + expenseArray);
+                                //  setAdapterData();
+                                adapter1 = new MyAdapter(getContext(), expenseArray);
+                                lvExpenseMaster.setAdapter(adapter1);
+
+                                progressBar.dismiss();
+                            }
+
+                        } else {
                             progressBar.dismiss();
                             Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            expenseArray.clear();
-                            for (int i = 0; i < data.getExpenses().size(); i++) {
-                                expenseArray.add(i, data.getExpenses().get(i));
-                            }
-                            Log.e("ON RESPONSE : ", " DATA : " + expenseArray);
-                            //  setAdapterData();
-                            adapter1 = new MyAdapter(getContext(), expenseArray);
-                            lvExpenseMaster.setAdapter(adapter1);
-
-                            progressBar.dismiss();
+                            Log.e("ON RESPONSE : ", " NO DATA ");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Toast.makeText(getContext(), "unable to fetch data!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", " NO DATA ");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -211,7 +214,7 @@ public class ExpenseMasterFragment extends Fragment {
             });
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -221,98 +224,10 @@ public class ExpenseMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
-
-  /*  public void setAdapterData() {
-        adapter = new ArrayAdapter<Expense>(getContext(), android.R.layout.simple_list_item_1, expenseArray) {
-            @NonNull
-            @Override
-            public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                View v = inflater.inflate(R.layout.custom_expense_master, null);
-
-
-                ImageView ivPopup1 = v.findViewById(R.id.ivExpenseMaster_popup);
-
-                TextView tvAccType = v.findViewById(R.id.tvExpenseMaster_AccType);
-                TextView tvExpName = v.findViewById(R.id.tvExpenseMaster_ExpName);
-                TextView tvExpType = v.findViewById(R.id.tvExpenseMaster_ExpType);
-
-                Typeface lightFont = Typeface.createFromAsset(getContext().getAssets(), "sofiapro-light.otf");
-                Typeface boldFont = Typeface.createFromAsset(getContext().getAssets(), "SofiaProBold.otf");
-
-                tvAccType.setTypeface(boldFont);
-                tvExpName.setTypeface(lightFont);
-                tvExpType.setTypeface(boldFont);
-
-                tvAccType.setText(" " + expenseArray.get(position).getExpAccType() + " ");
-                tvExpName.setText("" + expenseArray.get(position).getExpName());
-                tvExpType.setText("" + expenseArray.get(position).getExpType());
-
-
-                ivPopup1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        PopupMenu popupMenu = new PopupMenu(getContext(), view);
-                        popupMenu.getMenuInflater().inflate(R.menu.popup_expense_master, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem menuItem) {
-                                if (menuItem.getItemId() == R.id.item_exp_edit) {
-
-                                    Fragment adf = new EditExpenseFragment();
-                                    Bundle args = new Bundle();
-                                    args.putString("Expense_Name", expenseArray.get(position).getExpName());
-                                    args.putString("Expense_Type", expenseArray.get(position).getExpType());
-                                    args.putString("Expense_Acc_Type", expenseArray.get(position).getExpAccType());
-                                    args.putString("Expense_Entry_Type", expenseArray.get(position).getExpEntryType());
-                                    args.putString("Expense_Entry_Access_To", expenseArray.get(position).getExpAccessTo());
-                                    args.putInt("Expense_Photo_Req", expenseArray.get(position).getExpIsPhotoReq());
-                                    args.putInt("Expense_Id", expenseArray.get(position).getExpId());
-                                    adf.setArguments(args);
-                                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, adf).commit();
-
-                                } else if (menuItem.getItemId() == R.id.item_exp_ledger) {
-                                    Fragment fragment = new ViewExpenseLedgerFragment();
-                                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                                    ft.replace(R.id.content_frame, fragment);
-                                    ft.commit();
-                                } else if (menuItem.getItemId() == R.id.item_exp_delete) {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                    builder.setTitle("Confirm Action");
-                                    builder.setMessage("Do you really want to delete expense?");
-                                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            deleteExpenseData(expenseArray.get(position).getExpId());
-                                        }
-                                    });
-                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                                    AlertDialog dialog = builder.create();
-                                    dialog.show();
-                                    //Toast.makeText(getContext(), "deleted", Toast.LENGTH_SHORT).show();
-                                }
-                                return true;
-                            }
-                        });
-                        setForceShowIcon(popupMenu);
-                        popupMenu.show();
-                    }
-                });
-                return v;
-            }
-        };
-        lvExpenseMaster.setAdapter(adapter);
-    }*/
 
     public void deleteExpenseData(long expId) {
 
@@ -325,55 +240,60 @@ public class ExpenseMasterFragment extends Fragment {
 
             Call<ErrorMessage> errorMessageCall = api.deleteExpenses(expId);
 
-            progressBar = new ProgressDialog(getContext());
-            progressBar.setCancelable(false);
-            progressBar.setMessage("please wait....");
-            progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar.setProgress(0);
-            progressBar.setMax(100);
-            progressBar.show();
+            progressBar1 = new ProgressDialog(getContext());
+            progressBar1.setCancelable(false);
+            progressBar1.setMessage("please wait....");
+            progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar1.setProgress(0);
+            progressBar1.setMax(100);
+            progressBar1.show();
 
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "unable to delete expense!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar1.dismiss();
+                                Toast.makeText(getContext(), "unable to delete expense!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar1.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("Expense deleted successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearArrayList();
+                                        getAllExpenseData();
+                                        //setAdapterData();
+                                        adapter1.notifyDataSetChanged();
+                                        edSearch.setText("");
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
-                            progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("Expense deleted successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    clearArrayList();
-                                    getAllExpenseData();
-                                    //setAdapterData();
-                                    adapter1.notifyDataSetChanged();
-                                    edSearch.setText("");
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            progressBar1.dismiss();
+                            Toast.makeText(getContext(), "Unable to delete expense!", Toast.LENGTH_SHORT).show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
-                        progressBar.dismiss();
-                        Toast.makeText(getContext(), "Unable to delete expense!", Toast.LENGTH_SHORT).show();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                    } catch (Exception e) {
+                        progressBar1.dismiss();
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                    progressBar.dismiss();
+                    progressBar1.dismiss();
                     Toast.makeText(getContext(), "Unable to delete expense!", Toast.LENGTH_SHORT).show();
                     Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                 }
@@ -381,7 +301,7 @@ public class ExpenseMasterFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -391,7 +311,7 @@ public class ExpenseMasterFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
 
@@ -400,7 +320,6 @@ public class ExpenseMasterFragment extends Fragment {
     private void clearArrayList() {
         expenseArray.clear();
     }
-
 
     public class MyAdapter extends BaseAdapter implements Filterable {
 
@@ -479,7 +398,7 @@ public class ExpenseMasterFragment extends Fragment {
                                 ft.replace(R.id.content_frame, fragment);
                                 ft.commit();
                             } else if (menuItem.getItemId() == R.id.item_exp_delete) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
                                 builder.setTitle("Confirm Action");
                                 builder.setMessage("Do you really want to delete expense?");
                                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {

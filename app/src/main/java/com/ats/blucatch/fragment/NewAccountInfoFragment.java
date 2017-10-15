@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -116,11 +117,15 @@ public class NewAccountInfoFragment extends Fragment {
         MainActivity.isAtHomeFishSell = false;
         MainActivity.isAtAddNewAcc = true;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         userArray.clear();
         userArray.add(0, "Select User Type");
@@ -543,32 +548,38 @@ public class NewAccountInfoFragment extends Fragment {
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("New Account added successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        resetData();
+                                        getSpinnerDataforTandel_manager();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
                             progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("New Account added successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    resetData();
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -581,7 +592,7 @@ public class NewAccountInfoFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -591,11 +602,10 @@ public class NewAccountInfoFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
-
 
     public void getSpinnerDataforTandel_manager() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -617,37 +627,37 @@ public class NewAccountInfoFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                tandelArray.clear();
+                                tandelIdArray.clear();
+                                managerArray.clear();
+                                managerIdArray.clear();
+                                tandelIdArray.add(0, 0l);
+                                tandelArray.add(0, "Select Tandel");
+                                managerIdArray.add(0, 0l);
+                                managerArray.add(0, "Select Manager");
 
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            tandelArray.clear();
-                            tandelIdArray.clear();
-                            managerArray.clear();
-                            managerIdArray.clear();
-                            tandelIdArray.add(0, 0l);
-                            tandelArray.add(0, "Select Tandel");
-                            managerIdArray.add(0, 0l);
-                            managerArray.add(0, "Select Manager");
-
-                            for (int i = 0, k = 1, a = 1; i < data.getAccount().size(); i++) {
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
-                                    tandelArray.add(k, data.getAccount().get(i).getAccName());
-                                    tandelIdArray.add(k, data.getAccount().get(i).getAccId());
-                                    k++;
+                                for (int i = 0, k = 1, a = 1; i < data.getAccount().size(); i++) {
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
+                                        tandelArray.add(k, data.getAccount().get(i).getAccName());
+                                        tandelIdArray.add(k, data.getAccount().get(i).getAccId());
+                                        k++;
+                                    }
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Manager")) {
+                                        managerArray.add(a, data.getAccount().get(i).getAccName());
+                                        managerIdArray.add(a, data.getAccount().get(i).getAccId());
+                                        a++;
+                                    }
                                 }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Manager")) {
-                                    managerArray.add(a, data.getAccount().get(i).getAccName());
-                                    managerIdArray.add(a, data.getAccount().get(i).getAccId());
-                                    a++;
-                                }
-                            }
 
-                            Log.e("RESPONSE : ", " Tandel Array : " + tandelArray);
-                            Log.e("RESPONSE : ", " Manager Array : " + managerArray);
+                                Log.e("RESPONSE : ", " Tandel Array : " + tandelArray);
+                                Log.e("RESPONSE : ", " Manager Array : " + managerArray);
 /*
                             MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
                                     getContext(),
@@ -663,12 +673,16 @@ public class NewAccountInfoFragment extends Fragment {
                             spUserSubType.setAdapter(spAdapterManager);
 */
 
-                            progressBar1.dismiss();
-                        }
+                                progressBar1.dismiss();
+                            }
 
-                    } else {
+                        } else {
+                            progressBar1.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
+                        }
+                    } catch (Exception e) {
                         progressBar1.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -681,7 +695,7 @@ public class NewAccountInfoFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -691,7 +705,7 @@ public class NewAccountInfoFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }

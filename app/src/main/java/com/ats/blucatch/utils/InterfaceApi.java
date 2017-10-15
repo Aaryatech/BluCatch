@@ -3,24 +3,36 @@ package com.ats.blucatch.utils;
 import com.ats.blucatch.bean.Account;
 import com.ats.blucatch.bean.AccountData;
 import com.ats.blucatch.bean.AccountListData;
+import com.ats.blucatch.bean.AddDevices;
 import com.ats.blucatch.bean.AllSpinnerDataForTrip;
 import com.ats.blucatch.bean.Boat;
 import com.ats.blucatch.bean.BoatData;
+import com.ats.blucatch.bean.BoatWiseExpenseData;
 import com.ats.blucatch.bean.ErrorMessage;
 import com.ats.blucatch.bean.Expense;
 import com.ats.blucatch.bean.ExpenseApproveData;
 import com.ats.blucatch.bean.ExpensesData;
 import com.ats.blucatch.bean.Fish;
+import com.ats.blucatch.bean.FishCatch;
 import com.ats.blucatch.bean.FishData;
+import com.ats.blucatch.bean.FishSellList;
+import com.ats.blucatch.bean.HomeCountData;
 import com.ats.blucatch.bean.LedgerData;
 import com.ats.blucatch.bean.Login;
+import com.ats.blucatch.bean.NotificationBean;
+import com.ats.blucatch.bean.NotificationData;
+import com.ats.blucatch.bean.Season;
+import com.ats.blucatch.bean.SeasonData;
 import com.ats.blucatch.bean.Transaction;
 import com.ats.blucatch.bean.TransactionAccountData;
 import com.ats.blucatch.bean.Trip;
 import com.ats.blucatch.bean.TripData;
 import com.ats.blucatch.bean.TripExpensesListData;
+import com.ats.blucatch.bean.TripSettleTransactions;
 import com.ats.blucatch.bean.User;
 import com.ats.blucatch.bean.UserData;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -34,7 +46,8 @@ import retrofit2.http.Query;
 
 public interface InterfaceApi {
 
-    public static final String URL = "http://192.168.1.7:8099/";
+    //public static final String URL = "http://blucatch.ap-south-1.elasticbeanstalk.com/";
+    public static final String URL = "http://192.168.2.9:8075/";
     //public static final String URL = "http://192.168.1.104:8098/";
 
     public static final String MY_PREF = "BluCatch";
@@ -99,6 +112,9 @@ public interface InterfaceApi {
     @GET("getAllTripData")
     Call<TripData> allTripData();
 
+    @GET("getAllTripDataBySeason")
+    Call<TripData> allTripDataBySeason(@Query("coId") int coId);
+
     @POST("insertTrip")
     Call<ErrorMessage> addTrip(@Body Trip trip);
 
@@ -123,11 +139,20 @@ public interface InterfaceApi {
     @GET("getAllTripDataByTandelId")
     Call<TripData> allTripDataByTandel(@Query("tandelId") long tandelId);
 
+    @GET("getAllTripDataByTandelIdAndSeason")
+    Call<TripData> allTripDataByTandelAndSeason(@Query("tandelId") long tandelId, @Query("coId") int coId);
+
     @GET("getAllTripDataByManagerId")
     Call<TripData> allTripDataByManager(@Query("managerId") long managerId);
 
+    @GET("getAllTripDataByManagerIdAndSeason")
+    Call<TripData> allTripDataByManagerAndSeason(@Query("managerId") long managerId, @Query("coId") int coId);
+
     @GET("getAllTripDataByAuctionerId")
     Call<TripData> allTripDataByAuctioner(@Query("auctionerId") long auctionerId);
+
+    @GET("getAllTripDataByAuctionerIdAndSeason")
+    Call<TripData> allTripDataByAuctionerAndSeason(@Query("auctionerId") long auctionerId, @Query("coId") int coId);
 
     @POST("changePasswordUser")
     Call<ErrorMessage> changePassword(@Query("userId") int userId, @Query("userOldPass") String oldPass, @Query("userNewPass") String newPass);
@@ -147,7 +172,6 @@ public interface InterfaceApi {
     @POST("approveExpense")
     Call<ErrorMessage> approveExpense(@Query("trId") int trId, @Query("remark") String remark, @Query("userId") int userId);
 
-
     @POST("rejectExpense")
     Call<ErrorMessage> rejectExpense(@Query("trId") int trId, @Query("remark") String remark, @Query("userId") int userId);
 
@@ -166,5 +190,39 @@ public interface InterfaceApi {
     @GET("getAccountListForTripSettle")
     Call<TransactionAccountData> allAccountForTripSettle(@Query("tripId") long tripId);
 
+    @POST("insertFishCatch")
+    Call<ErrorMessage> addFishCatch(@Body ArrayList<FishCatch> fitchCatch);
 
+    @GET("getFishSellList")
+    Call<FishSellList> getFishSellList(@Query("tripId") long tripId);
+
+    @POST("insertSeason")
+    Call<ErrorMessage> addSeason(@Body Season season);
+
+    @GET("getAllSeasonData")
+    Call<SeasonData> getAllSeason(@Query("coId") int coId);
+
+    @GET("getAllTripDataByBoatId")
+    Call<TripData> allTripDataByBoat(@Query("boatId") long boatId);
+
+    @GET("getAllExpensesForBoat")
+    Call<BoatWiseExpenseData> allBoatExpenses(@Query("boatId") long boatId);
+
+    @POST("insertTripSettleTransaction")
+    Call<ErrorMessage> tripSettle(@Query("tripId") long tripId, @Body ArrayList<TripSettleTransactions> tripSettleTransactionses);
+
+    @POST("insertDeviceToken")
+    Call<ErrorMessage> addDeviceToken(@Body AddDevices addDevices);
+
+    @POST("insertNotification")
+    Call<ErrorMessage> addNotification(@Body NotificationBean notification);
+
+    @GET("getAllNotification")
+    Call<NotificationData> getNotificationData(@Query("coId") int coId);
+
+    @GET("getAllHomeCount")
+    Call<HomeCountData> getHomeCount(@Query("coId") int coId);
+
+    @POST("seasonClose")
+    Call<ErrorMessage> seasonEnd(@Query("seasonId") int seasonId);
 }

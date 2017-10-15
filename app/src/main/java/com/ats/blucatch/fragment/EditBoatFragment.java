@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,7 +61,7 @@ public class EditBoatFragment extends Fragment {
     private ArrayList<String> auctionerArray = new ArrayList<>();
     private ArrayList<Long> auctionerIdArray = new ArrayList<>();
     private ArrayList<String> fishingTypeArray = new ArrayList<>();
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBar1;
 
     long boatId;
 
@@ -108,11 +109,15 @@ public class EditBoatFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         boatStatusArray.clear();
         boatStatusArray.add(0, "Select Boat Status");
@@ -402,85 +407,89 @@ public class EditBoatFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                for (int i = 0, j = 0, k = 0, a = 0; i < data.getAccount().size(); i++) {
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Owner")) {
+                                        ownerArray.add(j, data.getAccount().get(i).getAccName());
+                                        ownerIdArray.add(j, data.getAccount().get(i).getAccId());
+                                        j++;
+                                    }
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
+                                        tandelArray.add(k, data.getAccount().get(i).getAccName());
+                                        tandelIdArray.add(k, data.getAccount().get(i).getAccId());
+                                        k++;
+                                    }
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Auctioner")) {
+                                        auctionerArray.add(a, data.getAccount().get(i).getAccName());
+                                        auctionerIdArray.add(a, data.getAccount().get(i).getAccId());
+                                        a++;
+                                    }
+                                }
 
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                Log.e("RESPONSE : ", " DATA : " + data.getAccount());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        ownerArray);
+                                spRegOwner.setAdapter(spAdapterOwner);
+
+
+                                MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        tandelArray);
+                                spRegTandel.setAdapter(spAdapterTandel);
+
+                                MySpinnerAdapter spAdapterAuctioner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        auctionerArray);
+                                spRegAuctioner.setAdapter(spAdapterAuctioner);
+
+                                String bOwner = getArguments().getString("Boat_Owner");
+                                String bTandel = getArguments().getString("Boat_Tandel");
+                                String bAuctioner = getArguments().getString("Boat_Auctioner");
+
+                                ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, ownerArray);
+                                adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spRegOwner.setAdapter(adapter1);
+                                if (!bOwner.equals(null)) {
+                                    int spinnerPosition = adapter1.getPosition(bOwner);
+                                    spRegOwner.setSelection(spinnerPosition);
+                                }
+
+                                ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, tandelArray);
+                                adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spRegTandel.setAdapter(adapter2);
+                                if (!bTandel.equals(null)) {
+                                    int spinnerPosition = adapter2.getPosition(bTandel);
+                                    spRegTandel.setSelection(spinnerPosition);
+                                }
+
+                                ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, auctionerArray);
+                                adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spRegAuctioner.setAdapter(adapter3);
+                                if (!bAuctioner.equals(null)) {
+                                    int spinnerPosition = adapter3.getPosition(bAuctioner);
+                                    spRegAuctioner.setSelection(spinnerPosition);
+                                }
+
+                                progressBar.dismiss();
+                            }
+
                         } else {
-                            for (int i = 0, j = 0, k = 0, a = 0; i < data.getAccount().size(); i++) {
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Owner")) {
-                                    ownerArray.add(j, data.getAccount().get(i).getAccName());
-                                    ownerIdArray.add(j, data.getAccount().get(i).getAccId());
-                                    j++;
-                                }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
-                                    tandelArray.add(k, data.getAccount().get(i).getAccName());
-                                    tandelIdArray.add(k, data.getAccount().get(i).getAccId());
-                                    k++;
-                                }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Auctioner")) {
-                                    auctionerArray.add(a, data.getAccount().get(i).getAccName());
-                                    auctionerIdArray.add(a, data.getAccount().get(i).getAccId());
-                                    a++;
-                                }
-                            }
-
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    ownerArray);
-                            spRegOwner.setAdapter(spAdapterOwner);
-
-
-                            MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    tandelArray);
-                            spRegTandel.setAdapter(spAdapterTandel);
-
-                            MySpinnerAdapter spAdapterAuctioner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    auctionerArray);
-                            spRegAuctioner.setAdapter(spAdapterAuctioner);
-
-                            String bOwner = getArguments().getString("Boat_Owner");
-                            String bTandel = getArguments().getString("Boat_Tandel");
-                            String bAuctioner = getArguments().getString("Boat_Auctioner");
-
-                            ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, ownerArray);
-                            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spRegOwner.setAdapter(adapter1);
-                            if (!bOwner.equals(null)) {
-                                int spinnerPosition = adapter1.getPosition(bOwner);
-                                spRegOwner.setSelection(spinnerPosition);
-                            }
-
-                            ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, tandelArray);
-                            adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spRegTandel.setAdapter(adapter2);
-                            if (!bTandel.equals(null)) {
-                                int spinnerPosition = adapter2.getPosition(bTandel);
-                                spRegTandel.setSelection(spinnerPosition);
-                            }
-
-                            ArrayAdapter<String> adapter3 = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, auctionerArray);
-                            adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spRegAuctioner.setAdapter(adapter3);
-                            if (!bAuctioner.equals(null)) {
-                                int spinnerPosition = adapter3.getPosition(bAuctioner);
-                                spRegAuctioner.setSelection(spinnerPosition);
-                            }
-
                             progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -493,7 +502,7 @@ public class EditBoatFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -503,7 +512,7 @@ public class EditBoatFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -605,50 +614,55 @@ public class EditBoatFragment extends Fragment {
 
                 Call<ErrorMessage> errorMessageCall = api.editBoat(id, boat);
 
-                progressBar = new ProgressDialog(getContext());
-                progressBar.setCancelable(false);
-                progressBar.setMessage("please wait....");
-                progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar.setProgress(0);
-                progressBar.setMax(100);
-                progressBar.show();
+                progressBar1 = new ProgressDialog(getContext());
+                progressBar1.setCancelable(false);
+                progressBar1.setMessage("please wait....");
+                progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressBar1.setProgress(0);
+                progressBar1.setMax(100);
+                progressBar1.show();
 
                 errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                     @Override
                     public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                        if (response.body() != null) {
-                            ErrorMessage data = response.body();
-                            if (data.getError()) {
-                                progressBar.dismiss();
-                                Toast.makeText(getContext(), "Unable to update boat!", Toast.LENGTH_SHORT).show();
-                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                        try {
+                            if (response.body() != null) {
+                                ErrorMessage data = response.body();
+                                if (data.getError()) {
+                                    progressBar1.dismiss();
+                                    Toast.makeText(getContext(), "Unable to update boat!", Toast.LENGTH_SHORT).show();
+                                    Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                } else {
+                                    progressBar1.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                    builder.setTitle("Success");
+                                    builder.setCancelable(false);
+                                    builder.setMessage("Boat updated successfully.");
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+                                    dialog.show();
+                                }
 
                             } else {
-                                progressBar.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Success");
-                                builder.setCancelable(false);
-                                builder.setMessage("Boat updated successfully.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
+                                progressBar1.dismiss();
+                                Toast.makeText(getContext(), "Unable to update boat!", Toast.LENGTH_SHORT).show();
+                                Log.e("ON RESPONSE : ", "NO DATA");
                             }
-
-                        } else {
-                            progressBar.dismiss();
-                            Toast.makeText(getContext(), "Unable to update boat!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "NO DATA");
+                        } catch (Exception e) {
+                            progressBar1.dismiss();
+                            Log.e("Exception : ", "" + e.getMessage());
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                        progressBar.dismiss();
+                        progressBar1.dismiss();
                         Toast.makeText(getContext(), "Unable to update boat!", Toast.LENGTH_SHORT).show();
                         Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
                     }
@@ -656,7 +670,7 @@ public class EditBoatFragment extends Fragment {
 
             }
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -666,7 +680,7 @@ public class EditBoatFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }

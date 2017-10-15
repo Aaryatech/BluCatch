@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,11 +118,16 @@ public class EditAccountFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
+
 
         userArray.clear();
         userArray.add(0, "Select User Type");
@@ -333,28 +339,39 @@ public class EditAccountFragment extends Fragment {
             }
         });
 
-        accId = getArguments().getLong("Account_Id");
-        String bAccName = getArguments().getString("Account_Name");
-        String bUserType = getArguments().getString("User_Type");
-        final long bSubTypeId = getArguments().getLong("User_Sub_Type");
-        String bMobile = getArguments().getString("Account_Mobile");
-        long bdob = getArguments().getLong("Account_DOB");
-        String bAddress = getArguments().getString("Account_Address");
-        String bAadhar = getArguments().getString("Account_Aadhar");
-        String bBank = getArguments().getString("Account_Bank");
-        String bRemark = getArguments().getString("Account_Remark");
-        String bEmrgName1 = getArguments().getString("Account_Emrg_Name1");
-        String bEmrgName2 = getArguments().getString("Account_Emrg_Name2");
-        String bEmrgMobile1 = getArguments().getString("Account_Emrg_Mobile1");
-        String bEmrgMobile2 = getArguments().getString("Account_Emrg_Mobile2");
-        String bBloodGrp = getArguments().getString("Account_BloodGrp");
-        String bTransType = getArguments().getString("Account_Transaction");
-        String bAccType = getArguments().getString("Account_Type");
-        double bOpneBal = getArguments().getDouble("Account_OpenBal");
-        int bPercent = getArguments().getInt("Account_Percent");
+        String bAccName = "", bUserType = "", bMobile = "", bAddress = "", bAadhar = "", bBank = "", bRemark = "", bEmrgName1 = "", bEmrgName2 = "", bEmrgMobile1 = "", bEmrgMobile2 = "", bBloodGrp = "", bTransType = "", bAccType = "";
+        double bOpneBal = 0;
+        int bPercent = 0;
+        long bSubTypeId = 0;
+        long bdob = 0;
+        try {
+            accId = getArguments().getLong("Account_Id");
+            bAccName = getArguments().getString("Account_Name");
+            bUserType = getArguments().getString("User_Type");
+            bSubTypeId = getArguments().getLong("User_Sub_Type");
+            bMobile = getArguments().getString("Account_Mobile");
+            bdob = getArguments().getLong("Account_DOB");
+            bAddress = getArguments().getString("Account_Address");
+            bAadhar = getArguments().getString("Account_Aadhar");
+            bBank = getArguments().getString("Account_Bank");
+            bRemark = getArguments().getString("Account_Remark");
+            bEmrgName1 = getArguments().getString("Account_Emrg_Name1");
+            bEmrgName2 = getArguments().getString("Account_Emrg_Name2");
+            bEmrgMobile1 = getArguments().getString("Account_Emrg_Mobile1");
+            bEmrgMobile2 = getArguments().getString("Account_Emrg_Mobile2");
+            bBloodGrp = getArguments().getString("Account_BloodGrp");
+            bTransType = getArguments().getString("Account_Transaction");
+            bAccType = getArguments().getString("Account_Type");
+            bOpneBal = getArguments().getDouble("Account_OpenBal");
+            bPercent = getArguments().getInt("Account_Percent");
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
+
 
         if (bAccType.equalsIgnoreCase("User")) {
             rbUser.setChecked(true);
+            rbTransaction.setEnabled(false);
             edAcc.setText(bAccName);
             edOpenBal.setText("" + bOpneBal);
             edMobile.setText(bMobile);
@@ -406,6 +423,7 @@ public class EditAccountFragment extends Fragment {
 
         } else {
             rbTransaction.setChecked(true);
+            rbUser.setEnabled(false);
             edAcc.setText("Transaction");
             edOpenBal.setText("" + bOpneBal);
             edRemark.setText(bRemark);
@@ -420,6 +438,7 @@ public class EditAccountFragment extends Fragment {
 
         }
 
+        final long finalBSubTypeId = bSubTypeId;
         spUserType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -433,10 +452,10 @@ public class EditAccountFragment extends Fragment {
                             managerArray);
                     spUserSubType.setAdapter(spAdapterManager);
 
-                    Log.e("--------------", "User Sub Type Id : " + bSubTypeId);
+                    Log.e("--------------", "User Sub Type Id : " + finalBSubTypeId);
                     String name = null;
                     for (int j = 0; j < managerIdArray.size(); j++) {
-                        if (bSubTypeId == managerIdArray.get(j)) {
+                        if (finalBSubTypeId == managerIdArray.get(j)) {
                             name = managerArray.get(j);
                             break;
                         }
@@ -461,10 +480,10 @@ public class EditAccountFragment extends Fragment {
                             tandelArray);
                     spUserSubType.setAdapter(spAdapterTandel);
 
-                    Log.e("--------------", "User Sub Type Id : " + bSubTypeId);
+                    Log.e("--------------", "User Sub Type Id : " + finalBSubTypeId);
                     String name = null;
                     for (int j = 0; j < tandelIdArray.size(); j++) {
-                        if (bSubTypeId == tandelIdArray.get(j)) {
+                        if (finalBSubTypeId == tandelIdArray.get(j)) {
                             name = tandelArray.get(j);
                             break;
                         }
@@ -685,32 +704,37 @@ public class EditAccountFragment extends Fragment {
             errorMessageCall.enqueue(new Callback<ErrorMessage>() {
                 @Override
                 public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                    if (response.body() != null) {
-                        ErrorMessage data = response.body();
-                        if (data.getError()) {
-                            progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBar.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBar.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("Account updated successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        //  resetData();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
 
                         } else {
                             progressBar.dismiss();
-                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                            builder.setTitle("Success");
-                            builder.setCancelable(false);
-                            builder.setMessage("Account updated successfully.");
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    //  resetData();
-                                }
-                            });
-                            android.app.AlertDialog dialog = builder.create();
-                            dialog.show();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -723,7 +747,7 @@ public class EditAccountFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -733,7 +757,7 @@ public class EditAccountFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -809,7 +833,7 @@ public class EditAccountFragment extends Fragment {
 
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -819,7 +843,7 @@ public class EditAccountFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }

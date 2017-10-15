@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,214 +28,20 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <ScrollView
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/cvBoatTripSearch">
+        android:layout_below="@id/cvBoatTripSearch"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/lvBoatTripDetails_List"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@color/colorWhite"
-                android:elevation="2dp"
-                app:cardElevation="5dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorWhite"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_TripNo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="2"
-                            android:drawableLeft="@mipmap/trip"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:text="Trip No : 14"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_Status"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="2"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical|center_horizontal"
-                            android:text="Live"
-                            android:textColor="@android:color/holo_red_light"
-                            android:textSize="18sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_BoatName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="1"
-                            android:drawableLeft="@mipmap/boat"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:text="Boat : Sagar"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_TandelCrew"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="2"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:text="Tandel + 14"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-                    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:divider="#00000000" />
 
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_StDate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="1"
-                            android:drawableLeft="@mipmap/date"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:text="St Dt : 25 june"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-
-                        <TextView
-                            android:id="@+id/tvTripDetails_TripDays"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="10dp"
-                            android:layout_weight="2"
-                            android:drawablePadding="10dp"
-                            android:gravity="center_vertical"
-                            android:text="14 Days"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:orientation="vertical">
-
-                        <TableRow
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:id="@+id/tvTripDetails_TripExpenses"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_column="0"
-                                android:layout_marginRight="5dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/custom_layout_border"
-                                android:gravity="center"
-                                android:maxLines="1"
-                                android:padding="10dp"
-                                android:singleLine="true"
-                                android:text="Trip Expenses"
-                                android:textColor="@color/colorBlue"
-                                android:textSize="18sp" />
-
-                            <TextView
-                                android:id="@+id/tvTripDetails_FishSell"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_column="1"
-                                android:layout_marginLeft="5dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/custom_layout_border"
-                                android:gravity="center"
-                                android:maxLines="1"
-                                android:padding="10dp"
-                                android:singleLine="true"
-                                android:text="Fish Sell"
-                                android:textColor="@color/colorBlue"
-                                android:textSize="18sp" />
-                        </TableRow>
-
-                        <TableRow
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:id="@+id/tvTripDetails_TripExpCount"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_column="0"
-                                android:layout_marginRight="5dp"
-                                android:layout_weight="1"
-                                android:background="@color/colorPrimary"
-                                android:gravity="center"
-                                android:maxLines="1"
-                                android:padding="10dp"
-                                android:singleLine="true"
-                                android:text="25000"
-                                android:textColor="@color/colorWhite"
-                                android:textSize="22sp" />
-
-                            <TextView
-                                android:id="@+id/tvTripDetails_FishSellCount"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_column="1"
-                                android:layout_marginLeft="5dp"
-                                android:layout_weight="1"
-                                android:background="@color/colorPrimary"
-                                android:gravity="center"
-                                android:maxLines="1"
-                                android:padding="10dp"
-                                android:singleLine="true"
-                                android:text="100000"
-                                android:textColor="@color/colorWhite"
-                                android:textSize="22sp" />
-
-                        </TableRow>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-        </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
 </RelativeLayout>

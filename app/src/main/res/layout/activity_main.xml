@@ -49,6 +49,21 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/tvMenuAddSeason"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:background="@mipmap/fish_bg"
+                            android:fontFamily="serif"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:paddingBottom="5dp"
+                            android:paddingTop="5dp"
+                            android:singleLine="true"
+                            android:text="Season Master"
+                            android:textSize="18sp" />
+
+                        <TextView
                             android:id="@+id/tvMenuAddAccount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -74,7 +89,7 @@
                             android:paddingBottom="5dp"
                             android:paddingTop="5dp"
                             android:singleLine="true"
-                            android:text="User Management"
+                            android:text="User Master"
                             android:textSize="18sp" />
 
                         <TextView
@@ -144,9 +159,8 @@
                             android:paddingBottom="5dp"
                             android:paddingTop="5dp"
                             android:singleLine="true"
-                            android:text="Transaction Master"
-                            android:textSize="18sp"
-                            android:visibility="gone" />
+                            android:text="Transaction"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/tvMenuViewLedger"

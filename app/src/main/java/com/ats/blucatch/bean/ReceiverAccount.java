@@ -13,8 +13,9 @@ public class ReceiverAccount {
     private String expCombo;
     private Integer expPhoto;
     private double expAmount;
+    private String expAccess;
 
-    public ReceiverAccount(long expId, String expName, String expType, String expEntry, String expCombo, Integer expPhoto, double expAmount) {
+    public ReceiverAccount(long expId, String expName, String expType, String expEntry, String expCombo, Integer expPhoto, double expAmount, String expAccess) {
         this.expId = expId;
         this.expName = expName;
         this.expType = expType;
@@ -22,6 +23,7 @@ public class ReceiverAccount {
         this.expCombo = expCombo;
         this.expPhoto = expPhoto;
         this.expAmount = expAmount;
+        this.expAccess = expAccess;
     }
 
     public long getExpId() {
@@ -80,4 +82,25 @@ public class ReceiverAccount {
         this.expAmount = expAmount;
     }
 
+    public String getExpAccess() {
+        return expAccess;
+    }
+
+    public void setExpAccess(String expAccess) {
+        this.expAccess = expAccess;
+    }
+
+    @Override
+    public String toString() {
+        return "ReceiverAccount{" +
+                "expId=" + expId +
+                ", expName='" + expName + '\'' +
+                ", expType='" + expType + '\'' +
+                ", expEntry='" + expEntry + '\'' +
+                ", expCombo='" + expCombo + '\'' +
+                ", expPhoto=" + expPhoto +
+                ", expAmount=" + expAmount +
+                ", expAccess='" + expAccess + '\'' +
+                '}';
+    }
 }

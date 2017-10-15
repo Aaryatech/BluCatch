@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -32,7 +33,9 @@ import android.widget.Toast;
 
 import com.ats.blucatch.R;
 import com.ats.blucatch.activity.MainActivity;
+import com.ats.blucatch.bean.ErrorMessage;
 import com.ats.blucatch.bean.Fish;
+import com.ats.blucatch.bean.FishCatch;
 import com.ats.blucatch.bean.FishData;
 import com.ats.blucatch.utils.CheckNetwork;
 import com.ats.blucatch.utils.InterfaceApi;
@@ -49,9 +52,9 @@ public class UserEnterFishSellFragment extends Fragment {
 
     static long tripId, boatId;
     static String boatName;
+    static int seasonId;
 
-    private long userId;
-    private int coId;
+    private int coId, userId;
 
     private ListView lvFishList;
     private TextView tvFishId, tvFishName;
@@ -59,7 +62,7 @@ public class UserEnterFishSellFragment extends Fragment {
     private TextInputLayout textFishName, textRate, textQty, textTotal;
     private Button btnAdd, btnSave, btnClear;
 
-    private ProgressDialog progressBar;
+    private ProgressDialog progressBar, progressBarSell;
 
     private ArrayAdapter<String> adapter;
 
@@ -74,6 +77,8 @@ public class UserEnterFishSellFragment extends Fragment {
 
     Dialog dialog;
 
+    ArrayList<FishCatch> catchArrayList = new ArrayList<FishCatch>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -86,16 +91,23 @@ public class UserEnterFishSellFragment extends Fragment {
         MainActivity.isAtHome = false;
         MainActivity.isAtUserFishSell = true;
         MainActivity.isAtUserTripExp = false;
+        MainActivity.isAtUserViewLedger=false;
+        MainActivity.isAtUserAccDetails=false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         try {
             boatName = getArguments().getString("User_Trip_Boat_Name");
             boatId = getArguments().getLong("User_Trip_Boat_ID");
             tripId = getArguments().getLong("User_Trip_ID");
+            seasonId = getArguments().getInt("User_Trip_Season_Id");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,13 +216,9 @@ public class UserEnterFishSellFragment extends Fragment {
                         lvFishList.setAdapter(adapter);
                         resetData();
                     }
-
-
                 }
-
             }
         });
-
 
         adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, fishNameList) {
             @NonNull
@@ -256,6 +264,23 @@ public class UserEnterFishSellFragment extends Fragment {
             }
         });
 
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fishIdList.size() <= 0) {
+                    Toast.makeText(getContext(), "please add fish data first", Toast.LENGTH_SHORT).show();
+                    edFishName.requestFocus();
+                } else {
+                    catchArrayList.clear();
+                    for (int i = 0; i < fishIdList.size(); i++) {
+                        FishCatch fishCatch = new FishCatch(tripId, fishIdList.get(i), fishRateList.get(i), fishQtyList.get(i), fishTotalList.get(i), "", coId, 0, userId);
+                        catchArrayList.add(fishCatch);
+                    }
+                    addFishSell(catchArrayList);
+                }
+            }
+        });
+
         return view;
     }
 
@@ -281,6 +306,7 @@ public class UserEnterFishSellFragment extends Fragment {
         fishQtyList.clear();
         fishTotalList.clear();
         lvFishList.setAdapter(adapter);
+        catchArrayList.clear();
         edFishName.requestFocus();
     }
 
@@ -305,23 +331,27 @@ public class UserEnterFishSellFragment extends Fragment {
                 @Override
                 public void onResponse(Call<FishData> call, Response<FishData> response) {
 
-                    if (response.body() != null) {
+                    try {
+                        if (response.body() != null) {
 
-                        FishData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("ON RESPONSE : ", " ERROR :  " + data.getErrorMessage().getMessage());
-                        } else {
-                            fishArray.clear();
-                            for (int i = 0; i < data.getFish().size(); i++) {
-                                fishArray.add(i, data.getFish().get(i));
+                            FishData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("ON RESPONSE : ", " ERROR :  " + data.getErrorMessage().getMessage());
+                            } else {
+                                fishArray.clear();
+                                for (int i = 0; i < data.getFish().size(); i++) {
+                                    fishArray.add(i, data.getFish().get(i));
+                                }
+                                progressBar.dismiss();
                             }
-                            progressBar.dismiss();
-                        }
 
-                    } else {
+                        } else {
+                            progressBar.dismiss();
+                            Log.e("ON RESPONSE : ", " NO DATA ");
+                        }
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("ON RESPONSE : ", " NO DATA ");
                     }
 
                 }
@@ -334,7 +364,7 @@ public class UserEnterFishSellFragment extends Fragment {
             });
 
         } else {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -344,7 +374,7 @@ public class UserEnterFishSellFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();
         }
     }
@@ -495,6 +525,122 @@ public class UserEnterFishSellFragment extends Fragment {
             return filter;
         }
     }
+    
+    public void addFishSell(ArrayList<FishCatch> catchArrayList) {
+        if (CheckNetwork.isInternetAvailable(getContext())) {
 
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            InterfaceApi api = retrofit.create(InterfaceApi.class);
+
+            Call<ErrorMessage> errorMessageCall = api.addFishCatch(catchArrayList);
+
+            progressBarSell = new ProgressDialog(getContext());
+            progressBarSell.setCancelable(false);
+            progressBarSell.setMessage("please wait....");
+            progressBarSell.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBarSell.setProgress(0);
+            progressBarSell.setMax(100);
+            progressBarSell.show();
+
+            errorMessageCall.enqueue(new Callback<ErrorMessage>() {
+                @Override
+                public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage data = response.body();
+                            if (data.getError()) {
+                                progressBarSell.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Error");
+                                builder.setCancelable(false);
+                                builder.setMessage("" + data.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                            } else {
+                                progressBarSell.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setTitle("Success");
+                                builder.setCancelable(false);
+                                builder.setMessage("fish catch added successfully.");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        clearData();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+
+                        } else {
+                            progressBarSell.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                            builder.setTitle("Error");
+                            builder.setCancelable(false);
+                            builder.setMessage("Unable to save");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+
+                            Log.e("ON RESPONSE : ", "NO DATA");
+                        }
+                    } catch (Exception e) {
+                        progressBarSell.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ErrorMessage> call, Throwable t) {
+                    progressBarSell.dismiss();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                    builder.setTitle("Error");
+                    builder.setCancelable(false);
+                    builder.setMessage("Server Error");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                    Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
+                }
+            });
+
+
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+            builder.setTitle("Check Connectivity");
+            builder.setCancelable(false);
+            builder.setMessage("Please Connect to Internet");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
 
 }

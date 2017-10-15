@@ -49,4 +49,14 @@ public class SenderAccount {
     public void setAccAmount(double accAmount) {
         this.accAmount = accAmount;
     }
+
+    @Override
+    public String toString() {
+        return "SenderAccount{" +
+                "accId=" + accId +
+                ", accName='" + accName + '\'' +
+                ", accType='" + accType + '\'' +
+                ", accAmount=" + accAmount +
+                '}';
+    }
 }

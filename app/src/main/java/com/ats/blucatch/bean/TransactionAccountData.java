@@ -10,6 +10,7 @@ public class TransactionAccountData {
 
     private List<SenderAccount> senderAccount;
     private List<ReceiverAccount> receiverAccount;
+    private double sellCount;
     private ErrorMessage errorMessage;
 
     public List<SenderAccount> getSenderAccount() {
@@ -28,11 +29,29 @@ public class TransactionAccountData {
         this.receiverAccount = receiverAccount;
     }
 
+    public double getSellCount() {
+        return sellCount;
+    }
+
+    public void setSellCount(double sellCount) {
+        this.sellCount = sellCount;
+    }
+
     public ErrorMessage getErrorMessage() {
         return errorMessage;
     }
 
     public void setErrorMessage(ErrorMessage errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionAccountData{" +
+                "senderAccount=" + senderAccount +
+                ", receiverAccount=" + receiverAccount +
+                ", sellCount=" + sellCount +
+                ", errorMessage=" + errorMessage +
+                '}';
     }
 }

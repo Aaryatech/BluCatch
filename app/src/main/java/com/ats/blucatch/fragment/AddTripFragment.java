@@ -110,11 +110,15 @@ public class AddTripFragment extends Fragment {
         MainActivity.isAtHomeTripExp = false;
         MainActivity.isAtHomeFishSell = false;
 
-        SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        userId = pref.getInt("AppUserId", 0);
-        coId = pref.getInt("AppCoId", 0);
-        Log.e("Co_id : ", "" + coId);
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
+        }
 
         spBoatName = view.findViewById(R.id.spAddTrip_BoatName);
         tvBoatName = view.findViewById(R.id.tvLabelAddTrip_BoatName);
@@ -197,112 +201,138 @@ public class AddTripFragment extends Fragment {
     }
 
     public void addNewTrip() {
-        if (CheckNetwork.isInternetAvailable(getContext())) {
+        try {
+            if (CheckNetwork.isInternetAvailable(getContext())) {
 
-            if (tvBoatId.getText().toString().trim().isEmpty()) {
-                Toast.makeText(getContext(), "please select boat", Toast.LENGTH_SHORT).show();
-                spBoatName.requestFocus();
-            } else if (tvTandelId.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "please select tandel", Toast.LENGTH_SHORT).show();
-                spTandelName.requestFocus();
-            } else if (tvAuctionerId.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "please select auctioner", Toast.LENGTH_SHORT).show();
-                spAuctionerName.requestFocus();
-            } else if (edStaffCount.getText().toString().isEmpty()) {
-                Toast.makeText(getContext(), "please select staff", Toast.LENGTH_SHORT).show();
-                edStaffCount.requestFocus();
-            } else {
-                long boatId = Integer.parseInt(tvBoatId.getText().toString().trim());
-                long tanId = Integer.parseInt(tvTandelId.getText().toString().trim());
-                long aucId = Integer.parseInt(tvAuctionerId.getText().toString().trim());
-                String staffCount = "";
-                if (rbLive.isChecked()) {
-                    status = "Live";
-                } else if (rbClosed.isChecked()) {
-                    status = "Closed";
+                if (tvBoatId.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getContext(), "please select boat", Toast.LENGTH_SHORT).show();
+                    spBoatName.requestFocus();
+                } else if (tvTandelId.getText().toString().isEmpty()) {
+                    Toast.makeText(getContext(), "please select tandel", Toast.LENGTH_SHORT).show();
+                    spTandelName.requestFocus();
+                } else if (tvAuctionerId.getText().toString().isEmpty()) {
+                    Toast.makeText(getContext(), "please select auctioner", Toast.LENGTH_SHORT).show();
+                    spAuctionerName.requestFocus();
                 }
-                for (int m = 0; m < tempIds.size(); m++) {
-                    staffCount += tempIds.get(m) + ",";
-                }
-                Log.e("Staff Parameter : ", "" + staffCount);
-                String staffIds = staffCount.substring(0, staffCount.length() - 1);
-                Log.e("Staff Parameter : ", " After Trip : " + staffIds);
-
-                Trip trip = new Trip(boatId, 0, 0, tanId, aucId, staffIds, 0, status, 0, coId, 0, userId);
-
-                Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-                InterfaceApi api = retrofit.create(InterfaceApi.class);
-
-                Call<ErrorMessage> errorMessageCall = api.addTrip(trip);
-
-                progressBar2 = new ProgressDialog(getContext());
-                progressBar2.setCancelable(false);
-                progressBar2.setMessage("please wait....");
-                progressBar2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                progressBar2.setProgress(0);
-                progressBar2.setMax(100);
-                progressBar2.show();
-
-                errorMessageCall.enqueue(new Callback<ErrorMessage>() {
-                    @Override
-                    public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
-                        if (response.body() != null) {
-                            ErrorMessage data = response.body();
-                            if (data.getError()) {
-                                progressBar2.dismiss();
-                                Toast.makeText(getContext(), "unable to add trip!", Toast.LENGTH_SHORT).show();
-                                Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
-
-                            } else {
-                                progressBar2.dismiss();
-                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-                                builder.setTitle("Success");
-                                builder.setCancelable(false);
-                                builder.setMessage("New Trip added successfully.");
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                        resetData();
-                                    }
-                                });
-                                android.app.AlertDialog dialog = builder.create();
-                                dialog.show();
-                            }
-
-                        } else {
-                            progressBar2.dismiss();
-                            Toast.makeText(getContext(), "unable to add trip!", Toast.LENGTH_SHORT).show();
-                            Log.e("ON RESPONSE : ", "NO DATA");
-                        }
+//            else if (edStaffCount.getText().toString().isEmpty()) {
+//                Toast.makeText(getContext(), "please select staff", Toast.LENGTH_SHORT).show();
+//                edStaffCount.requestFocus();
+//            }
+                else {
+                    long boatId = Integer.parseInt(tvBoatId.getText().toString().trim());
+                    long tanId = Integer.parseInt(tvTandelId.getText().toString().trim());
+                    long aucId = Integer.parseInt(tvAuctionerId.getText().toString().trim());
+                    String staffCount = "";
+                    if (rbLive.isChecked()) {
+                        status = "Live";
+                    } else if (rbClosed.isChecked()) {
+                        status = "Closed";
                     }
+                    String staffIds = "";
+                    if (tempIds.size() > 0) {
+                        for (int m = 0; m < tempIds.size(); m++) {
+                            staffCount += tempIds.get(m) + ",";
+                        }
+                        Log.e("Staff Parameter : ", "" + staffCount);
+                        staffIds = staffCount.substring(0, staffCount.length() - 1);
+                        Log.e("Staff Parameter : ", " After Trip : " + staffIds);
+                    }
+                    Trip trip = new Trip(boatId, 0, 0, tanId, aucId, staffIds, 0, status, 0, coId, 0, userId, 0);
 
+                    Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build();
+                    InterfaceApi api = retrofit.create(InterfaceApi.class);
+
+                    Call<ErrorMessage> errorMessageCall = api.addTrip(trip);
+
+                    progressBar2 = new ProgressDialog(getContext());
+                    progressBar2.setCancelable(false);
+                    progressBar2.setMessage("please wait....");
+                    progressBar2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressBar2.setProgress(0);
+                    progressBar2.setMax(100);
+                    progressBar2.show();
+
+                    errorMessageCall.enqueue(new Callback<ErrorMessage>() {
+                        @Override
+                        public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
+                            try {
+                                if (response.body() != null) {
+                                    ErrorMessage data = response.body();
+                                    if (data.getError()) {
+                                        progressBar2.dismiss();
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                        builder.setTitle("Error");
+                                        builder.setCancelable(false);
+                                        builder.setMessage("" + data.getMessage());
+                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                resetData();
+                                            }
+                                        });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                        // Toast.makeText(getContext(), "unable to add trip!", Toast.LENGTH_SHORT).show();
+                                        Log.e("ON RESPONSE : ", "ERROR : " + data.getMessage());
+
+                                    } else {
+                                        progressBar2.dismiss();
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                        builder.setTitle("Success");
+                                        builder.setCancelable(false);
+                                        builder.setMessage("New Trip added successfully.");
+                                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                resetData();
+                                            }
+                                        });
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
+
+                                } else {
+                                    progressBar2.dismiss();
+                                    Toast.makeText(getContext(), "unable to add trip!", Toast.LENGTH_SHORT).show();
+                                    Log.e("ON RESPONSE : ", "NO DATA");
+                                }
+                            } catch (Exception e) {
+                                progressBar2.dismiss();
+                                Log.e("Exception : ", "" + e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ErrorMessage> call, Throwable t) {
+                            progressBar2.dismiss();
+                            Toast.makeText(getContext(), "unable to add trip! server error", Toast.LENGTH_SHORT).show();
+                            Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
+                        }
+                    });
+
+                }
+            } else
+
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                builder.setTitle("Check Connectivity");
+                builder.setCancelable(false);
+                builder.setMessage("Please Connect to Internet");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onFailure(Call<ErrorMessage> call, Throwable t) {
-                        progressBar2.dismiss();
-                        Toast.makeText(getContext(), "unable to add trip! server error", Toast.LENGTH_SHORT).show();
-                        Log.e("ON FAILURE : ", "ERROR : " + t.getMessage());
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                     }
                 });
-
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
-        } else
-
-        {
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
-            builder.setTitle("Check Connectivity");
-            builder.setCancelable(false);
-            builder.setMessage("Please Connect to Internet");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            android.app.AlertDialog dialog = builder.create();
-            dialog.show();
+        } catch (Exception e) {
+            Log.e("Exception e : ", "" + e.getMessage());
         }
 
     }
@@ -313,13 +343,9 @@ public class AddTripFragment extends Fragment {
         spBoatName.setSelection(0);
         spTandelName.setSelection(0);
         spAuctionerName.setSelection(0);
-
-
         getSpinnerDataforBoat();
-        getSpinnerDataforName();
-
+        getSpinnerDataforAccount();
     }
-
 
     public void getSpinnerDataforBoat() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -330,59 +356,62 @@ public class AddTripFragment extends Fragment {
             InterfaceApi api = retrofit.create(InterfaceApi.class);
             Call<BoatData> boatDataCall = api.allBoatData();
 
-            progressBar1 = new ProgressDialog(getContext());
-            progressBar1.setCancelable(false);
-            progressBar1.setMessage("please wait....");
-            progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar1.setProgress(0);
-            progressBar1.setMax(100);
-            progressBar1.show();
+            //  progressBar1 = new ProgressDialog(getContext());
+            // progressBar1.setCancelable(false);
+            // progressBar1.setMessage("please wait....");
+            //  progressBar1.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            //   progressBar1.setProgress(0);
+            //   progressBar1.setMax(100);
+            //   progressBar1.show();
 
             boatDataCall.enqueue(new Callback<BoatData>() {
                 @Override
                 public void onResponse(Call<BoatData> call, Response<BoatData> response) {
-
-                    if (response.body() != null) {
-                        BoatData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            boatArray.clear();
-                            boatIdArray.clear();
-                            for (int i = 0, j = 0; i < data.getBoatDisp().size(); i++) {
-                                if (data.getBoatDisp().get(i).getBlockStatus() != 1 && data.getBoatDisp().get(i).getBoatStatus().equalsIgnoreCase("Ready to go")) {
-                                    boatArray.add(j, data.getBoatDisp().get(i).getBoatName());
-                                    boatIdArray.add(j, data.getBoatDisp().get(i).getBoatId());
-                                    j++;
+                    try {
+                        if (response.body() != null) {
+                            BoatData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                //  progressBar1.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                boatArray.clear();
+                                boatIdArray.clear();
+                                for (int i = 0, j = 0; i < data.getBoatDisp().size(); i++) {
+                                    if (data.getBoatDisp().get(i).getBlockStatus() != 1 && data.getBoatDisp().get(i).getBoatStatus().equalsIgnoreCase("Ready to go")) {
+                                        boatArray.add(j, data.getBoatDisp().get(i).getBoatName());
+                                        boatIdArray.add(j, data.getBoatDisp().get(i).getBoatId());
+                                        j++;
+                                    }
                                 }
+
+                                Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        boatArray);
+                                spBoatName.setAdapter(spAdapterOwner);
+                                //    progressBar1.dismiss();
                             }
 
-                            Log.e("RESPONSE : ", " DATA : " + data.getBoatDisp());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    boatArray);
-                            spBoatName.setAdapter(spAdapterOwner);
-                            progressBar1.dismiss();
+                        } else {
+                            //    progressBar1.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
-                        progressBar1.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                    } catch (Exception e) {
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<BoatData> call, Throwable t) {
-                    progressBar1.dismiss();
+                    //  progressBar1.dismiss();
                     Log.e("ON FAILURE : ", " ERROR : " + t.getMessage());
                 }
             });
 
 
         } else {
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -392,12 +421,11 @@ public class AddTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();*/
             Log.e("Add Trip : ", " NO Internet");
         }
     }
-
 
     public void getSpinnerDataforName() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -419,45 +447,49 @@ public class AddTripFragment extends Fragment {
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                for (int i = 0, k = 0, a = 0; i < data.getAccount().size(); i++) {
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
+                                        tandelArray.add(k, data.getAccount().get(i).getAccName());
+                                        tandelIdArray.add(k, data.getAccount().get(i).getAccId());
+                                        k++;
+                                    }
+                                    if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Auctioner")) {
+                                        auctionerArray.add(a, data.getAccount().get(i).getAccName());
+                                        auctionerIdArray.add(a, data.getAccount().get(i).getAccId());
+                                        a++;
+                                    }
+                                }
 
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            for (int i = 0, k = 0, a = 0; i < data.getAccount().size(); i++) {
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Tandel")) {
-                                    tandelArray.add(k, data.getAccount().get(i).getAccName());
-                                    tandelIdArray.add(k, data.getAccount().get(i).getAccId());
-                                    k++;
-                                }
-                                if (data.getAccount().get(i).getEmpType().equalsIgnoreCase("Auctioner")) {
-                                    auctionerArray.add(a, data.getAccount().get(i).getAccName());
-                                    auctionerIdArray.add(a, data.getAccount().get(i).getAccId());
-                                    a++;
-                                }
+                                Log.e("RESPONSE : ", " DATA : " + data.getAccount());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        tandelArray);
+                                spTandelName.setAdapter(spAdapterOwner);
+
+                                MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        auctionerArray);
+                                spAuctionerName.setAdapter(spAdapterTandel);
+
+                                progressBar.dismiss();
                             }
 
-                            Log.e("RESPONSE : ", " DATA : " + data.getAccount());
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    tandelArray);
-                            spTandelName.setAdapter(spAdapterOwner);
-
-                            MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    auctionerArray);
-                            spAuctionerName.setAdapter(spAdapterTandel);
-
+                        } else {
                             progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
@@ -470,7 +502,7 @@ public class AddTripFragment extends Fragment {
 
 
         } else {
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -480,12 +512,11 @@ public class AddTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();*/
             Log.e("Add Trip : ", " NO Internet");
         }
     }
-
 
     public void getSpinnerDataForStaff(final long tandelId) {
         if (CheckNetwork.isInternetAvailable(getContext())) {
@@ -496,46 +527,49 @@ public class AddTripFragment extends Fragment {
             InterfaceApi api = retrofit.create(InterfaceApi.class);
             Call<AccountData> accountDataCall = api.allAccountData();
 
-            progressBar3 = new ProgressDialog(getContext());
-            progressBar3.setCancelable(false);
-            progressBar3.setMessage("please wait....");
-            progressBar3.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressBar3.setProgress(0);
-            progressBar3.setMax(100);
-            progressBar3.show();
+//            progressBar3 = new ProgressDialog(getContext());
+//            progressBar3.setCancelable(false);
+//            progressBar3.setMessage("please wait....");
+//            progressBar3.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//            progressBar3.setProgress(0);
+//            progressBar3.setMax(100);
+//            progressBar3.show();
 
             accountDataCall.enqueue(new Callback<AccountData>() {
                 @Override
                 public void onResponse(Call<AccountData> call, Response<AccountData> response) {
-
-                    if (response.body() != null) {
-                        AccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar3.dismiss();
-                            Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            staffNameArray.clear();
-                            staffIdArray.clear();
-                            for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
-                                if (tandelId == data.getAccount().get(i).getTandelAccId()) {
-                                    staffNameArray.add(j, data.getAccount().get(i).getAccName());
-                                    staffIdArray.add(j, data.getAccount().get(i).getAccId());
+                    try {
+                        if (response.body() != null) {
+                            AccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                // progressBar3.dismiss();
+                                Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                staffNameArray.clear();
+                                staffIdArray.clear();
+                                for (int i = 0, j = 0; i < data.getAccount().size(); i++) {
+                                    if (tandelId == data.getAccount().get(i).getTandelAccId()) {
+                                        staffNameArray.add(j, data.getAccount().get(i).getAccName());
+                                        staffIdArray.add(j, data.getAccount().get(i).getAccId());
+                                    }
                                 }
+                                Log.e("RESPONSE : ", " CREW DATA : " + staffNameArray);
+
+                                // progressBar3.dismiss();
                             }
-                            Log.e("RESPONSE : ", " CREW DATA : " + staffNameArray);
 
-                            progressBar3.dismiss();
+                        } else {
+                            // progressBar3.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
-                        progressBar3.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                    } catch (Exception e) {
+                        Log.e("Exception : ", "" + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<AccountData> call, Throwable t) {
-                    progressBar3.dismiss();
+                    // progressBar3.dismiss();
                     Log.e("ON FAILURE : ", " ERROR : " + t.getMessage());
                 }
             });
@@ -590,7 +624,6 @@ public class AddTripFragment extends Fragment {
 
     }
 
-
     public void staffDialog() {
 
         String[] staffArray = new String[staffNameArray.size()];
@@ -600,7 +633,7 @@ public class AddTripFragment extends Fragment {
         tempCrewName.clear();
         tempIds.clear();
 
-        AlertDialog.Builder ab = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder ab = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
         ab.setTitle("Select Crew Members")
                 .setMultiChoiceItems(staffArray, null, new DialogInterface.OnMultiChoiceClickListener() {
 
@@ -642,7 +675,6 @@ public class AddTripFragment extends Fragment {
 
     }
 
-
     public void getSpinnerDataforAccount() {
         if (CheckNetwork.isInternetAvailable(getContext())) {
 
@@ -663,44 +695,48 @@ public class AddTripFragment extends Fragment {
             allSpinnerDataForTripCall.enqueue(new Callback<AllSpinnerDataForTrip>() {
                 @Override
                 public void onResponse(Call<AllSpinnerDataForTrip> call, Response<AllSpinnerDataForTrip> response) {
+                    try {
+                        if (response.body() != null) {
+                            AllSpinnerDataForTrip data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar.dismiss();
+                                // Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                tandelIdArray.clear();
+                                tandelArray.clear();
+                                auctionerIdArray.clear();
+                                auctionerArray.clear();
+                                for (int i = 0; i < data.getTandelSpinner().size(); i++) {
+                                    tandelArray.add(i, data.getTandelSpinner().get(i).getTandelName());
+                                    tandelIdArray.add(i, data.getTandelSpinner().get(i).getTandelId());
+                                }
+                                for (int i = 0; i < data.getAuctionerSpinner().size(); i++) {
+                                    auctionerArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerName());
+                                    auctionerIdArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerId());
+                                }
 
-                    if (response.body() != null) {
-                        AllSpinnerDataForTrip data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar.dismiss();
-                            // Log.e("RESPONSE : ", " ERROR : " + data.getErrorMessage().getMessage());
+                                MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        tandelArray);
+                                spTandelName.setAdapter(spAdapterOwner);
+
+                                MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
+                                        getContext(),
+                                        android.R.layout.simple_spinner_dropdown_item,
+                                        auctionerArray);
+                                spAuctionerName.setAdapter(spAdapterTandel);
+
+                                progressBar.dismiss();
+                            }
+
                         } else {
-                            tandelIdArray.clear();
-                            tandelArray.clear();
-                            auctionerIdArray.clear();
-                            auctionerArray.clear();
-                            for (int i = 0; i < data.getTandelSpinner().size(); i++) {
-                                tandelArray.add(i, data.getTandelSpinner().get(i).getTandelName());
-                                tandelIdArray.add(i, data.getTandelSpinner().get(i).getTandelId());
-                            }
-                            for (int i = 0; i < data.getAuctionerSpinner().size(); i++) {
-                                auctionerArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerName());
-                                auctionerIdArray.add(i, data.getAuctionerSpinner().get(i).getAuctionerId());
-                            }
-
-                            MySpinnerAdapter spAdapterOwner = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    tandelArray);
-                            spTandelName.setAdapter(spAdapterOwner);
-
-                            MySpinnerAdapter spAdapterTandel = new MySpinnerAdapter(
-                                    getContext(),
-                                    android.R.layout.simple_spinner_dropdown_item,
-                                    auctionerArray);
-                            spAuctionerName.setAdapter(spAdapterTandel);
-
                             progressBar.dismiss();
+                            Log.e("RESPONSE : ", " NO DATA");
                         }
-
-                    } else {
+                    } catch (Exception e) {
                         progressBar.dismiss();
-                        Log.e("RESPONSE : ", " NO DATA");
+                        Log.e("Exception : ", " " + e.getMessage());
                     }
                 }
 
@@ -713,7 +749,7 @@ public class AddTripFragment extends Fragment {
 
 
         } else {
-           /* android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getContext());
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(getContext(),R.style.AlertDialogTheme);
             builder.setTitle("Check Connectivity");
             builder.setCancelable(false);
             builder.setMessage("Please Connect to Internet");
@@ -723,7 +759,7 @@ public class AddTripFragment extends Fragment {
                     dialog.dismiss();
                 }
             });
-            android.app.AlertDialog dialog = builder.create();
+            AlertDialog dialog = builder.create();
             dialog.show();*/
 
             Log.e("Add Trip : ", " NO Internet");

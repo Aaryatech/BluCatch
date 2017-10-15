@@ -4,12 +4,16 @@ package com.ats.blucatch.fragment;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,8 +37,10 @@ import android.widget.Toast;
 
 import com.ats.blucatch.R;
 import com.ats.blucatch.activity.MainActivity;
+import com.ats.blucatch.bean.ErrorMessage;
 import com.ats.blucatch.bean.SenderAccount;
 import com.ats.blucatch.bean.TransactionAccountData;
+import com.ats.blucatch.bean.TripSettleTransactions;
 import com.ats.blucatch.utils.CheckNetwork;
 import com.ats.blucatch.utils.InterfaceApi;
 
@@ -57,7 +63,7 @@ public class TripSettleFragment extends Fragment {
     private RadioButton rbCash, rbCredit;
     private LinearLayout llToAcc;
 
-    private ProgressDialog progressBar1;
+    private ProgressDialog progressBar1, progressBar2;
 
     private ArrayList<SenderAccount> receiverAccountArray = new ArrayList<>();
     CustomCashAccAdapter myAdapter;
@@ -71,7 +77,9 @@ public class TripSettleFragment extends Fragment {
     Dialog dialog;
 
     static long tripId;
-    double remainingAmount = 500000;
+    static int seasonId;
+    int coId, userId;
+    double remainingAmount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,12 +90,27 @@ public class TripSettleFragment extends Fragment {
         MainActivity.tvTitle.setText("Trip Settle");
         MainActivity.tvTitle.setTypeface(boldFont);
 
-        MainActivity.isAtHome = true;
+
+        MainActivity.isAtHome = false;
+        MainActivity.isAtUserEnterTransaction = false;
+        MainActivity.isAtUserFishSell = false;
+        MainActivity.isAtUserTripExp = true;
 
         try {
             tripId = getArguments().getLong("Trip_Id");
+            seasonId = getArguments().getInt("Season_Id");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        try {
+            SharedPreferences pref = getContext().getSharedPreferences(InterfaceApi.MY_PREF, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            userId = pref.getInt("AppUserId", 0);
+            coId = pref.getInt("AppCoId", 0);
+            Log.e("Co_id : ", "" + coId);
+        } catch (Exception e) {
+            Log.e("Exception : ", "" + e.getMessage());
         }
 
         rgPayment = view.findViewById(R.id.rgTripSettle_radio);
@@ -146,7 +169,7 @@ public class TripSettleFragment extends Fragment {
                         if (receiverAccountArray.get(i).getAccType().equalsIgnoreCase("Auctioner")) {
                             edToAcc.setText("" + receiverAccountArray.get(i).getAccName());
                             tvToAccId.setText("" + receiverAccountArray.get(i).getAccId());
-                            Toast.makeText(getContext(), "" + receiverAccountArray.get(i).getAccName() + "\n" + receiverAccountArray.get(i).getAccId(), Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(getContext(), "" + receiverAccountArray.get(i).getAccName() + "\n" + receiverAccountArray.get(i).getAccId(), Toast.LENGTH_SHORT).show();
                             break;
                         }
                     }
@@ -161,6 +184,8 @@ public class TripSettleFragment extends Fragment {
                 showDialog();
             }
         });
+
+        final ArrayList<TripSettleTransactions> trList = new ArrayList<>();
 
         btnPay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,6 +211,10 @@ public class TripSettleFragment extends Fragment {
                         remainingAmount = remainingAmount - (Integer.parseInt(edAmount.getText().toString()));
                         tvUnsettledAmt.setText("" + remainingAmount);
                         lvList.setAdapter(adapter);
+
+                        TripSettleTransactions bean = new TripSettleTransactions(Long.parseLong(tvToAccId.getText().toString()), Double.parseDouble(edAmount.getText().toString()), tripId, coId, userId, seasonId);
+                        trList.add(bean);
+
                         //---------Clear fields----------
                         tvToAccId.setText("");
                         edToAcc.setText("");
@@ -212,6 +241,10 @@ public class TripSettleFragment extends Fragment {
                         remainingAmount = remainingAmount - (Integer.parseInt(edAmount.getText().toString()));
                         tvUnsettledAmt.setText("" + remainingAmount);
                         lvList.setAdapter(adapter);
+
+                        TripSettleTransactions bean = new TripSettleTransactions(Long.parseLong(tvToAccId.getText().toString()), Double.parseDouble(edAmount.getText().toString()), tripId, coId, userId, seasonId);
+                        trList.add(bean);
+
                         //---------Clear_Fields-----------
                         tvToAccId.setText("");
                         edToAcc.setText("");
@@ -249,6 +282,7 @@ public class TripSettleFragment extends Fragment {
                 tvType.setText("" + paymentModeArray.get(position));
                 tvAmount.setText("" + amountArray.get(position));
 
+
                 return v;
             }
         };
@@ -261,6 +295,43 @@ public class TripSettleFragment extends Fragment {
             }
         });
 
+        btnSettle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (Double.parseDouble(tvUnsettledAmt.getText().toString()) > 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                    builder.setTitle("Alert");
+                    builder.setCancelable(false);
+                    builder.setMessage("You cannot settle and close trip unsless unsettled amount is cleared");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                    builder.setTitle("Confirm Action");
+                    builder.setMessage("Are you sure you want to settle and close trip?");
+                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            settleAndCloseTrip(tripId, trList);
+                        }
+                    });
+                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            }
+        });
         return view;
     }
 
@@ -278,7 +349,6 @@ public class TripSettleFragment extends Fragment {
         rbCash.requestFocus();
 
     }
-
 
     public void showDialog() {
         dialog = new Dialog(getContext(), android.R.style.Theme_Light_NoTitleBar);
@@ -369,7 +439,11 @@ public class TripSettleFragment extends Fragment {
             holder.tvAmount.setTypeface(boldFont);
 
             holder.tvName.setText("" + displayedValues.get(position).getAccName());
-            holder.tvAmount.setText(" [ " + displayedValues.get(position).getAccAmount() + " ] ");
+            if (displayedValues.get(position).getAccType().equalsIgnoreCase("Default")) {
+                holder.tvAmount.setText("");
+            } else {
+                holder.tvAmount.setText("" + displayedValues.get(position).getAccType());
+            }
 
             holder.llAccount.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -422,8 +496,8 @@ public class TripSettleFragment extends Fragment {
             };
             return filter;
         }
-    }
 
+    }
 
     public void getToAccountData() {
 
@@ -445,21 +519,32 @@ public class TripSettleFragment extends Fragment {
             transactionAccountDataCall.enqueue(new Callback<TransactionAccountData>() {
                 @Override
                 public void onResponse(Call<TransactionAccountData> call, Response<TransactionAccountData> response) {
-                    if (response.body() != null) {
-                        TransactionAccountData data = response.body();
-                        if (data.getErrorMessage().getError()) {
-                            progressBar1.dismiss();
-                            Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
-                        } else {
-                            receiverAccountArray.clear();
-                            for (int i = 0; i < data.getSenderAccount().size(); i++) {
-                                receiverAccountArray.add(i, data.getSenderAccount().get(i));
+                    try {
+                        if (response.body() != null) {
+                            TransactionAccountData data = response.body();
+                            if (data.getErrorMessage().getError()) {
+                                progressBar1.dismiss();
+                                Log.e("ON RESPONSE : ", "ERROR : " + data.getErrorMessage().getMessage());
+                            } else {
+                                receiverAccountArray.clear();
+                                for (int i = 0; i < data.getSenderAccount().size(); i++) {
+                                    receiverAccountArray.add(i, data.getSenderAccount().get(i));
+                                }
+                                Log.e("ON RESPONSE : ", "Receiver Account Array : " + receiverAccountArray);
+
+                                tvFishCatch.setText("" + data.getSellCount() + "/-");
+                                remainingAmount = data.getSellCount();
+                                tvUnsettledAmt.setText("" + remainingAmount);
+
+                                progressBar1.dismiss();
                             }
+                        } else {
                             progressBar1.dismiss();
+                            Log.e("ON RESPONSE : ", "NO DATA");
                         }
-                    } else {
+                    } catch (Exception e) {
                         progressBar1.dismiss();
-                        Log.e("ON RESPONSE : ", "NO DATA");
+                        Log.e("TRIP SETTLE : ", " EXCEPTION : " + e.getMessage());
                     }
                 }
 
@@ -474,4 +559,127 @@ public class TripSettleFragment extends Fragment {
         }
     }
 
+    public void settleAndCloseTrip(long tId, ArrayList<TripSettleTransactions> listArray) {
+
+        if (CheckNetwork.isInternetAvailable(getContext())) {
+
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(InterfaceApi.URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            InterfaceApi api = retrofit.create(InterfaceApi.class);
+            Call<ErrorMessage> errorMessageCall = api.tripSettle(tripId, listArray);
+
+            progressBar2 = new ProgressDialog(getContext());
+            progressBar2.setCancelable(false);
+            progressBar2.setMessage("please wait....");
+            progressBar2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressBar2.setProgress(0);
+            progressBar2.setMax(100);
+            progressBar2.show();
+
+            errorMessageCall.enqueue(new Callback<ErrorMessage>() {
+                @Override
+                public void onResponse(Call<ErrorMessage> call, Response<ErrorMessage> response) {
+                    try {
+                        if (response.body() != null) {
+                            ErrorMessage errorMessage = response.body();
+                            if (errorMessage.getError()) {
+                                progressBar2.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setCancelable(false);
+                                builder.setTitle("Error");
+                                builder.setMessage("" + errorMessage.getMessage());
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            } else {
+                                progressBar2.dismiss();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                                builder.setCancelable(false);
+                                builder.setMessage("Success");
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        resetData();
+                                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                        ft.replace(R.id.content_frame, new UserHomeFragment());
+                                        ft.commit();
+                                    }
+                                });
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+
+                        } else {
+                            progressBar2.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                            builder.setCancelable(false);
+                            builder.setMessage("Oops something went wrong!");
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+
+                    } catch (Exception e) {
+                        progressBar2.dismiss();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                        builder.setCancelable(false);
+                        builder.setMessage("Oops something went wrong!");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ErrorMessage> call, Throwable t) {
+                    progressBar2.dismiss();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+                    builder.setTitle("Server Error");
+                    builder.setCancelable(false);
+                    builder.setMessage("Something went wrong!");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            });
+
+        } else {
+            Log.e("Check Connectivity : ", " : NO Internet");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+            builder.setTitle("Check Connectivity");
+            builder.setCancelable(false);
+            builder.setMessage("Please Connect to Internet");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+    }
 }

@@ -22,11 +22,14 @@ public class TripDisplay {
     private int coId;
     private long enterDate;
     private long enterBy;
+    private int seasonId;
+    private double expenseCount;
+    private double fishSellCount;
 
     public TripDisplay() {
     }
 
-    public TripDisplay(long tripId, long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, String boatName, String tandelName, String auctionerName, int coId, long enterDate, long enterBy) {
+    public TripDisplay(long tripId, long boatId, long tripStartDate, long tripEndDate, long tripTandelId, long tripAuctionerId, String tripStaff, int tripSettled, String tripStatus, int tripDelete, String boatName, String tandelName, String auctionerName, int coId, long enterDate, long enterBy, int seasonId, double expenseCount, double fishSellCount) {
         this.tripId = tripId;
         this.boatId = boatId;
         this.tripStartDate = tripStartDate;
@@ -43,6 +46,9 @@ public class TripDisplay {
         this.coId = coId;
         this.enterDate = enterDate;
         this.enterBy = enterBy;
+        this.seasonId = seasonId;
+        this.expenseCount = expenseCount;
+        this.fishSellCount = fishSellCount;
     }
 
     public long getTripId() {
@@ -173,6 +179,30 @@ public class TripDisplay {
         this.enterBy = enterBy;
     }
 
+    public int getSeasonId() {
+        return seasonId;
+    }
+
+    public void setSeasonId(int seasonId) {
+        this.seasonId = seasonId;
+    }
+
+    public double getExpenseCount() {
+        return expenseCount;
+    }
+
+    public void setExpenseCount(double expenseCount) {
+        this.expenseCount = expenseCount;
+    }
+
+    public double getFishSellCount() {
+        return fishSellCount;
+    }
+
+    public void setFishSellCount(double fishSellCount) {
+        this.fishSellCount = fishSellCount;
+    }
+
     @Override
     public String toString() {
         return "TripDisplay{" +
@@ -182,7 +212,7 @@ public class TripDisplay {
                 ", tripEndDate=" + tripEndDate +
                 ", tripTandelId=" + tripTandelId +
                 ", tripAuctionerId=" + tripAuctionerId +
-                ", tripStaff=" + tripStaff +
+                ", tripStaff='" + tripStaff + '\'' +
                 ", tripSettled=" + tripSettled +
                 ", tripStatus='" + tripStatus + '\'' +
                 ", tripDelete=" + tripDelete +
@@ -192,6 +222,9 @@ public class TripDisplay {
                 ", coId=" + coId +
                 ", enterDate=" + enterDate +
                 ", enterBy=" + enterBy +
+                ", seasonId=" + seasonId +
+                ", expenseCount=" + expenseCount +
+                ", fishSellCount=" + fishSellCount +
                 '}';
     }
 }
